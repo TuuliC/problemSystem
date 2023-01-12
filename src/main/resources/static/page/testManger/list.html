@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../../plugins/element-ui/index.css"/>
+    <link rel="stylesheet" href="../../styles/page.css"/>
+    <style>
+        .dashboard-container .container .tableBox .el-image img {
+            width: 20px;
+            border-radius: 26px;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container" id="combo-app">
+    <div class="container">
+        <div class="tableBar">
+            <el-input
+                    v-model="input"
+                    placeholder="请输入题目名称"
+                    style="width: 250px"
+                    clearable
+                    @keyup.enter.native="handleQueryTest"
+            >
+            </el-input>
+
+            <span v-if="input !== ''" style="height: 40px">
+        <el-button
+                type="text"
+                style="margin-right: 560px"
+                @click="initTest"
+        >
+          <img src="../../images/icons/sreach.png" style="width: 20px;height: 20px;margin-top: 0px;"/>
+        </el-button>
+        </span>
+
+            <div class="tableLab">
+                <el-button
+                        type="text"
+                        size="small"
+                        style="color: #fdd24c;border-right: solid 1px #d8dde3;"
+                        @click="deleteHandleTest('批量')"
+                >
+                    批量删除&nbsp&nbsp&nbsp
+                </el-button>
+
+                <el-button
+                        type="text"
+                        size="small"
+                        style="color: #85ce61;border-right: solid 1px #d8dde3;"
+                        @click="deleteHandleTest('1')"
+                >
+                    批量启用&nbsp&nbsp&nbsp
+                </el-button>
+
+                <el-button
+                        type="text"
+                        style="color: #f56c6c"
+                        @click="statusHandleTest('0')"
+                >批量停用
+                </el-button>
+
+                <el-button
+                        type="primary"
+                        style="background: #8cc5ff"
+                        @click="addTest('add')"
+                        icon="el-icon-plus"
+                >
+                    添加题目
+                </el-button>
+            </div>
+        </div>
+        <el-table
+                :data="tableData"
+                stripe
+                width="500"
+                class="tableBox"
+                @selection-change="handleSelectionChange"
+                :header-cell-style="{ 'text-align': 'center' }"
+                :cell-style="{ 'text-align': 'center' }"
+        >
+            <el-table-column
+                    type="selection"
+                    width="80"
+            ></el-table-column>
+            <el-table-column
+                    prop="id"
+                    width="130"
+                    label="题目编号"
+            ></el-table-column>
+            <el-table-column
+                    prop="describe"
+                    width="350"
+                    label="题目描述"
+            ></el-table-column>
+            <el-table-column
+                    prop=""
+                    width="200"
+                    label="题目图片"
+            ></el-table-column>
+            <el-table-column
+                    prop="answer"
+                    width="150"
+                    label="答案"
+            ></el-table-column>
+            <el-table-column
+                    prop="quesCour"
+                    width="200"
+                    label="所属课程"
+            ></el-table-column>
+            <el-table-column
+                    prop="chapter"
+                    width="200"
+                    label="所属章节"
+            ></el-table-column>
+            <el-table-column
+                    prop="hard"
+                    width="150"
+                    label="难度"
+            ></el-table-column>
+            <el-table-column
+                    prop="score"
+                    width="150"
+                    label="分值"
+            ></el-table-column>
+
+
+            <el-table-column
+                    label="操作"
+                    width="100"
+                    align="center"
+            >
+                <template slot-scope="scope">
+
+                    <el-button
+                            type="text"
+                            @click="addTest(scope.row.id)"
+                    >
+                        <img src="../../images/icons/edit.png" style="width: 20px;height: 20px"/>
+                    </el-button>
+
+                    <el-button
+                            type="text"
+                            @click="deleteHandleTest('单删', scope.row.id)"
+                    >
+                        <img src="../../images/icons/del.png" style="width: 20px;height: 20px"/>
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+        <el-pagination
+                class="pageList"
+                :page-sizes="[10, 20, 30, 40]"
+                :page-size="pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="counts"
+                @size-change="handleSizeChange"
+                :current-page.sync="page"
+                @current-change="handleCurrentChange"
+        ></el-pagination>
+    </div>
+</div>
+<!-- 开发环境版本，包含了有帮助的命令行警告 -->
+<script src="../../plugins/vue/vue.js"></script>
+<!-- 引入组件库 -->
+<script src="../../plugins/element-ui/index.js"></script>
+<!-- 引入axios -->
+<script src="../../plugins/axios/axios.min.js"></script>
+<script src="../../js/request.js"></script>
+<script src="../../api/test.js"></script>
+<script>
+    new Vue({
+        el: '#combo-app',
+        data() {
+            return {
+                input: '',
+                counts: 0,
+                page: 1,
+                pageSize: 10,
+                question: {
+                    id: "",
+                    description: "",
+                    picture: "",
+                    option: "",
+                    answer: "",
+                    quesCour: "",
+                    chapter: "",
+                    hard: "",
+                    score: ""
+                },
+                tableData: [],
+            }
+        },
+        computed: {},
+        created() {
+            /**
+             * 加载页面时进行初始化
+             * */
+            this.initTest()
+        },
+        mounted() {
+
+        },
+        methods: {
+
+            selectAll() {
+                axios({
+                    method: "post",
+                    url: "/questions",
+                    data: this.question
+                }).then(resp => {
+                    this.tableData = resp.data.rows;
+                    /*this.totalCount = resp.data.totalCount;*/
+                    this.totalCount = 2;
+                })
+            },
+
+
+            async initTest() {
+                const params = {
+                    page: this.page,
+                    pageSize: this.pageSize,
+                    name: this.input ? this.input : undefined
+                }
+                await getTestPage(params).then(res => {
+                    if (String(res.code) === '1') {
+                        //alert(res.data)
+                        this.tableData = res.data.list || []
+                        this.counts = res.data.total
+                    }
+                }).catch(err => {  //
+                    this.$message.error('请求出错了：' + err)
+                })
+            },
+            /**
+             * 页面初始页码
+             * */
+
+            handleQueryTest() {
+                this.page = 1;
+                this.initTest();
+            },
+            // 添加
+            addTest(st) {
+                if (st === 'add') {
+                    window.parent.menuHandle({
+                        id: '4',
+                        url: 'page/testManger/add.html',
+                        name: '添加题目'
+                    }, true)
+                } else {
+                    window.parent.menuHandle({
+                        id: '4',
+                        url: 'page/testManger/add.html?id=' + st,
+                        name: '修改题目信息'
+                    }, true)
+                }
+            },
+
+            // 删除
+            deleteHandleTest(type, id) {
+                if (type === '批量' && id === null) {
+                    if (this.checkList.length === 0) {
+                        return this.$message.error('请选择删除对象')
+                    }
+                }
+                this.$confirm('确定删除该题目, 是否继续?', '确定删除', {
+                    'confirmButtonText': '确定',
+                    'cancelButtonText': '取消',
+                }).then(() => {
+                    deleteTest(type === '批量' ? this.checkList.join(',') : id).then(res => {
+                        if (res.code === 1) {
+                            if (res.data === 'success')
+                                this.$message.success('删除成功！');
+                            else
+                                this.$message.error(res.data);
+                            this.handleQueryTest()
+                        } else {
+                            this.$message.error(res.msg || '操作失败')
+                        }
+                    }).catch(err => {
+                        this.$message.error('请求出错了：' + err)
+                    })
+                })
+            },
+
+
+            // 全部操作
+            handleSelectionChange(val) {
+                let checkArr = []
+                val.forEach((n) => {
+                    checkArr.push(n.id)
+                })
+                this.checkList = checkArr
+            },
+            handleSizeChange(val) {
+                this.pageSize = val
+                this.initTest()
+            },
+            handleCurrentChange(val) {
+                this.page = val
+                this.initTest()
+            }
+        }
+    })
+</script>
+</body>
+</html>

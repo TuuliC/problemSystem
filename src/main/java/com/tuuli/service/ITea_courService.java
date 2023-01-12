@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author tuuli
- * @since 2023-01-11
+ * @since 2023-01-12
  */
 public interface ITea_courService extends IService<Tea_cour> {
 

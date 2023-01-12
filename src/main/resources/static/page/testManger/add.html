@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+    <!--<link rel="stylesheet" href="../../styles/common.css" />-->
+    <link rel="stylesheet" href="../../styles/page.css" />
+    <style>
+      .el-button--primary {
+        color: #333333;
+        background-color: #a4da89;
+        border-color: #a4da89;
+      }
+      .continue {
+        border-color: #333333 !important;
+        background: #333333 !important;
+        color: #ffffff !important;
+      }
+      .continue:hover {
+        background-color: #999999 !important;
+        border-color: #999999 !important;
+        color: #ffffff !important;
+      }
+      .continue:active {
+        background-color: #2a2a2a !important;
+        border-color: #2a2a2a !important;
+        color: #ffffff !important;
+      }
+      element.style {
+        margin-right: 650px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="addBrand-container" id="combo-add-app">
+      <div class="container">
+        <el-form
+          ref="ruleForm"
+          :model="ruleForm"
+          :rules="rules"
+          :inline="false"
+          label-width="460px"
+        >
+          <div>
+            <el-form-item label="题目名称:" prop="name">
+              <el-input :disabled= ruleForm?"false":"true"  v-model="ruleForm.name" placeholder="请填写题目名称" maxlength="20"
+              />
+            </el-form-item>
+
+
+            <el-form-item label="题目描述" prop="desc">
+              <el-input v-model="ruleForm.desc" placeholder="请输入题目描述" maxlength="20"/>
+
+            </el-form-item>
+
+            <el-form-item label="题目分值" prop="grade" >
+              <el-input v-model="ruleForm.grade" placeholder="题目分值" maxlength="20"/>
+            </el-form-item>
+            <el-form-item label="题目类型" prop="type" >
+              <el-select v-model="ruleForm.type" placeholder="请选择类型" @change="$forceUpdate()">
+                <el-option
+                        v-for="item in types"
+                        :label="item.name"
+                        :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+
+          </div>
+
+          <div>
+            <el-form-item
+              label-width="400px"
+            >
+              <el-button @click="goBackAddTest()"> 取消 </el-button>
+              <el-button type="primary" @click="submitFormAddTest('ruleForm', false)"> 保存 </el-button>
+              <el-button
+                v-if="actionType === 'add'"
+                type="primary"
+                class="continue"
+                @click="submitFormAddTest('ruleForm', true)"
+              >
+                保存并继续添加
+              </el-button>
+            </el-form-item>
+          </div>
+        </el-form>
+      </div>
+
+    </div>
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="../../plugins/vue/vue.js"></script>
+    <!-- 引入组件库 -->
+    <script src="../../plugins/element-ui/index.js"></script>
+    <!-- 引入axios -->
+    <script src="../../plugins/axios/axios.min.js"></script>
+    <script src="../../js/request.js"></script>
+    <script src="../../api/test.js"></script>
+    <script src="../../js/validate.js"></script>
+    <script src="../../js/index.js"></script>
+    <script>
+      new Vue({
+        el: '#combo-add-app',
+        data() {
+          return {
+            id:'',
+            actionType: '',
+            ruleForm: {
+              name:'',
+              desc:'',
+              grade:'',
+              type:''
+            },
+            types:[],
+
+          }
+        },
+        computed: {
+          rules() {
+            return {
+              name: {
+                required: true,
+                message: '请输入题目名称',
+                trigger: 'blur',
+              },
+
+            }
+          },
+        },
+        watch:{
+
+        },
+        created() {
+          this.id = requestUrlParam('id');
+          this.actionType = this.id ? 'edit' : 'add'
+          if (this.id) {
+            this.initAddTest()
+          }
+          this.getType();
+        },
+        mounted() {},
+        methods: {
+          async initAddTest() {
+            queryTestById(this.id).then((res) => {
+              if (String(res.code) === '1') {
+               this.ruleForm = res.data;
+              } else {
+                this.$message.error(res.msg || '操作失败')
+              }
+            })
+          },
+          getType(){
+            getTypes().then(res =>{
+              if(res.code === 1){
+                this.types = res.data.map((obj) => ({...obj,id : obj.name}))
+              }
+            })
+          },
+          submitFormAddTest(formName, st) {
+                let prams = this.ruleForm;
+
+                if (this.actionType === 'add') {
+                  addTest(prams)
+                    .then((res) => {
+                      if (res.code === 1) {
+                        this.$message.success('添加成功！')
+                        if (!st) {
+                          this.goBack()
+                        } else {
+                          this.ruleForm = {
+                            id:'',
+                            name:'',
+                            desc:'',
+                            grade:'',
+                            type:'',
+                          }
+                        }
+                      } else {
+                        this.$message.error(res.msg || '操作失败')
+                      }
+                    })
+                    .catch((err) => {
+                      this.$message.error('请求出错了：' + err)
+                    })
+                } else {
+                  editTest(prams)
+                    .then((res) => {
+                      if (res.code === 1) {
+                        this.$message.success('修改成功！')
+                        this.goBack()
+                      } else {
+                        this.$message.error(res.msg || '操作失败')
+                      }
+                    })
+                    .catch((err) => {
+                      this.$message.error('请求出错了：' + err)
+                    })
+                }
+
+          },
+          handleAvatarSuccess (response, file, fileList) {
+            // this.imageUrl = response.data
+            if(response.code === 0 && response.msg === '未登录'){
+              window.top.location.href = '/backend/page/login/login.html'
+            }else{
+              this.imageUrl = `/common/download?name=${response.data}`
+              this.ruleForm.image = response.data
+            }
+          },
+
+          goBackAddTest() {
+            window.parent.menuHandle(
+              {
+                id: '4',
+                url: 'page/testManger/list.html',
+                name: '试题管理',
+              },
+              false
+            )
+          },
+
+        },
+      })
+    </script>
+  </body>
+</html>

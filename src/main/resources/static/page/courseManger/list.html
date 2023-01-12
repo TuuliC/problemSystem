@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+  <link rel="stylesheet" href="../../styles/page.css" />
+  <style>
+    .dashboard-container .container .tableBox .el-image img {
+      width: 20px;
+      border-radius: 26px;
+    }
+  </style>
+</head>
+<body>
+   <div class="dashboard-container" id="combo-app">
+    <div class="container">
+      <div class="tableBar">
+        <el-input
+          v-model="input"
+          placeholder="请输入课程名称"
+          style="width: 250px"
+          clearable
+          @keyup.enter.native="handleQueryCourse"
+        >
+        </el-input>
+
+        <span v-if ="input !== ''" style="height: 40px">
+        <el-button
+                type="text"
+                style="margin-right: 560px"
+                @click="initCourse"
+        >
+          <img src="../../images/icons/sreach.png" style="width: 20px;height: 20px;" />
+        </el-button>
+        </span>
+
+        <div class="tableLab" >
+          <span v-if="!dialogFormVisible">
+          <el-button
+                  type="text"
+                  size="small"
+                  style="color: #fdd24c;border-right: solid 1px #d8dde3;"
+                  @click="deleteHandleCourse('批量')"
+          >
+            批量删除&nbsp&nbsp&nbsp
+          </el-button>
+
+            <span v-if="id === '0'">
+          <el-button
+                  type="text"
+                  size="small"
+                  style="color: #85ce61;border-right: solid 1px #d8dde3;"
+                  @click="deleteHandleCourse('1')"
+          >
+            批量启用&nbsp&nbsp&nbsp
+          </el-button>
+
+          <el-button
+                  type="text"
+                  style="color: #f56c6c"
+                  @click="statusHandleCourse('0')"
+          >批量停用</el-button>
+            </span>
+          <el-button
+                  type="primary"
+                  style="background: #8cc5ff"
+                  @click="addCou('add')"
+                  icon="el-icon-plus"
+          >
+            添加课程
+          </el-button>
+          </span>
+          <span v-else>
+             <el-input
+                     v-model="courseName"
+                     placeholder="请输入课程名称"
+                     style="width: 250px"
+                     clearable
+             >
+          </el-input>
+          <el-button type="success" icon="el-icon-check" circle @click="addCou('submit')"></el-button>
+            <el-button type="danger" icon="el-icon-close" circle @click="close()"></el-button>
+          </span>
+        </div>
+
+      </div>
+      <el-table
+        :data="tableData"
+        stripe
+        width="500"
+        class="tableBox"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column
+          type="selection"
+          width="80"
+        ></el-table-column>
+        <el-table-column
+                prop="id"
+                width="300"
+                label="课程编号"
+        ></el-table-column>
+        <el-table-column
+          prop="name"
+          width="400"
+          label="课程名称"
+        ></el-table-column>
+
+        <el-table-column label="状态">
+          <template slot-scope="scope">
+            <span>{{ scope.row.status === '0' ? '停用' : '启用' }}</span>
+          </template>
+        </el-table-column>
+
+
+
+        <el-table-column
+          label="操作"
+          width="260"
+          align="center"
+        >
+          <template slot-scope="scope">
+
+            <span v-if="id ==='0'">
+            <el-popover
+                    placement="right"
+                    width="300"
+                    trigger="click"
+            >
+              <el-input
+                      v-model="editName"
+                      placeholder="请修改课程名称"
+                      style="width: 250px"
+                      clearable
+              >
+              </el-input>
+              <el-button type="success" icon="el-icon-check" circle @click="editCourse(scope.row.id,editName,false)"></el-button>
+              <el-button
+                      slot="reference"
+                      type="text"
+                      @click="editCourse(scope.row.id,scope.row.name,true)"
+              >
+                <img src="../../images/icons/edit.png" style="width: 20px;height: 20px"/>
+              </el-button>
+            </el-popover>
+            <el-button
+              type="text"
+              @click="statusHandleCourse(scope.row)"
+            >
+              <!--{{ scope.row.status === '0' ? '启用' : '停用' }}-->
+              <span v-if="scope.row.status === '0'">
+                <el-image src="../../images/icons/start.png"  style="width: 20px;height: 20px"></el-image>
+              </span>
+              <span v-else>
+                <el-image src="../../images/icons/stop.png"  style="width: 20px;height: 20px"></el-image>
+              </span>
+            </el-button>
+            </span>
+
+            <span v-else>
+              <el-button
+                      type="text"
+                      @click="addMyCourse(scope.row.id)"
+              >
+              <img src="../../images/icons/xiangmujine@2x.png" style="width: 20px;height: 20px" />
+            </el-button>
+              <el-button
+                      type="text"
+                      @click="show(scope.row.id)"
+              >
+              <img src="../../images/icons/class.png" style="width: 20px;height: 20px" />
+            </el-button>
+            </span>
+
+            <el-button
+               type="text"
+              @click="deleteHandleCourse('单删', scope.row.id)"
+            >
+              <img src="../../images/icons/del.png" style="width: 20px;height: 20px" />
+            </el-button>
+
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        class="pageList"
+        :page-sizes="[10, 20, 30, 40]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="counts"
+        @size-change="handleSizeChange"
+        :current-page.sync="page"
+        @current-change="handleCurrentChange"
+      ></el-pagination>
+
+
+    </div>
+
+     <el-dialog title="添加班级" :visible.sync="dialogForm">
+       <el-form :model="classId">
+         <el-form-item label="班级" :label-width="120">
+           <el-select v-model="classes" placeholder="请选择要添加的班级">
+             <el-option
+                     v-for="item in classes"
+                     :key="item.id"
+                     :label="item.name"
+                     :value="item.id">
+             </el-option>
+           </el-select>
+         </el-form-item>
+       </el-form>
+       <div slot="footer" class="dialog-footer">
+         <el-button @click="dialogForm = false">取 消</el-button>
+         <el-button type="primary" @click="addClassByTeacher()">确 定</el-button>
+       </div>
+     </el-dialog>
+  </div>
+
+
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="../../plugins/vue/vue.js"></script>
+    <!-- 引入组件库 -->
+    <script src="../../plugins/element-ui/index.js"></script>
+    <!-- 引入axios -->
+    <script src="../../plugins/axios/axios.min.js"></script>
+    <script src="../../js/request.js"></script>
+    <script src="../../api/course.js"></script>
+    <script src="../../api/student.js"></script>
+    <script>
+      new Vue({
+        el: '#combo-app',
+        data() {
+          return {
+            id:'',
+            input: '',
+            counts: 0,
+            page: 1,
+            pageSize: 10,
+            courseName:'',
+            editName:'',
+             tableData : [
+               {
+                 id:'123',
+                 name:'231',
+                 status:'1'
+               }
+             ],
+            dialogFormVisible : false,
+            dialogForm : false,
+            classes:[],
+            classId:'',
+            courseId:'',
+          }
+        },
+        computed: {},
+        created() {
+          /**
+           * 加载页面时进行初始化
+           * */
+          this.initCourse();
+          this.id = requestUrlParam('id');
+        },
+        mounted() {
+        },
+        methods: {
+          async initCourse () {
+            const params = {
+              page: this.page,
+              pageSize: this.pageSize,
+              name: this.input ? this.input : undefined
+            }
+            await getCoursePage(params).then(res => {
+              if (String(res.code) === '1') {
+                this.tableData = res.data.list || []
+                this.counts = res.data.total
+              }
+            }).catch(err => {
+              this.$message.error('请求出错了：' + err)
+            })
+          },
+          show(id){
+            this.courseId = id;
+            this.dialogForm = true;
+          },
+          addClassByTeacher(){
+            this.dialogForm = false;
+            let item = window.sessionStorage.getItem("teacher");
+            addClassByTeacher(this.courseId,this.classId,item.id).then(res =>{
+
+            })
+          },
+          getClass(){
+            getClasses().then((res) => {
+              if(res.code === 1){
+                this.classes = res.data.map((obj) =>({ ...obj,id : obj.name}))
+              }
+            })
+          },
+          /**
+           * 页面初始页码
+           * */
+          handleQueryCourse() {
+            this.page = 1;
+            this.initCourse();
+          },
+          addMyCourse(id){
+            let item = window.sessionStorage.getItem("teacher");
+            addCourseByTeacher(item.id,id).then(res =>{
+              if(res.code === '1'){
+                this.$message.success('添加成功！');
+              }else{
+                this.$message.error("添加失败")
+              }
+            }).catch(err => {
+              this.$message.error('请求出错了：' + err)
+            })
+          }
+          ,
+          // 添加
+          addCou(st) {
+            if (st === 'add'){
+              this.dialogFormVisible = true;
+            }else{
+              if(this.courseName === ''){
+                this.$message.error('请输入课程名');
+              }else{
+                alert(this.courseName);
+                addCourse(this.courseName).then(res =>{
+                  if(res.code === 1){
+                    this.initCourse()
+                    this.courseName = '';
+                    this.dialogFormVisible = false;
+                  }else{
+                    this.$message.error(res.msg || '操作失败')
+                  }
+                }).catch(err => {
+                  this.$message.error('请求出错了：' + err)
+                })
+              }
+            }
+          },
+          editCourse(code,value,flag){
+            if(flag)
+                this.editName = value;
+            else{
+              let pram = {
+                id : code,
+                name : value
+              }
+                editCourse(pram).then(res=>{
+                  if(res.code === 1){
+
+                    this.initCourse();
+                  }else{
+                    this.$message.error(res.msg || '操作失败')
+                  }
+                })
+            }
+          },
+
+          // 删除
+          deleteHandleCourse (type, id) {
+            if (type === '批量' && id === null) {
+              if (this.checkList.length === 0) {
+                return this.$message.error('请选择删除对象')
+              }
+            }
+            this.$confirm('确定删除, 是否继续?', '确定删除', {
+              'confirmButtonText': '确定',
+              'cancelButtonText': '取消',
+            }).then(() => {
+              deleteCourse(type === '批量' ? this.checkList.join(',') : id).then(res => {
+                if (res.code === 1) {
+                  if(res.data === 'success')
+                    this.$message.success('删除成功！');
+                  else
+                    this.$message.error(res.data);
+                  this.handleQueryCourse()
+                } else {
+                  this.$message.error(res.msg || '操作失败')
+                }
+              }).catch(err => {
+                this.$message.error('请求出错了：' + err)
+              })
+            })
+          },
+
+          //状态更改
+          statusHandleCourse (row) {
+            let params = {}
+            if (typeof row === 'string' ){
+              if (this.checkList.length === 0){
+                this.$message.error('批量操作，请先勾选操作！')
+                return false
+              }
+              params.ids = this.checkList.join(',')
+              params.status = row
+            } else {
+              params.ids = row.id
+              params.status = row.status ? '0' : '1'
+            }
+            this.$confirm('确认更改该状态?', '提示', {
+              'confirmButtonText': '确定',
+              'cancelButtonText': '取消',
+              'type': 'warning'
+            }).then(() => {
+             CourseStatusByStatus(params).then(res => {
+                if (res.code === 1) {
+                  this.$message.success('状态已经更改成功！')
+                  this.handleQueryCourse()
+                } else {
+                  this.$message.error(res.msg || '操作失败')
+                }
+              }).catch(err => {
+                  this.$message.error('请求出错了：' + err)
+              })
+            })
+          },
+
+          close(){
+            this.dialogFormVisible = false;
+          },
+          // 全部操作
+          handleSelectionChange (val){
+            let checkArr = []
+            val.forEach((n) => {
+              checkArr.push(n.id)
+            })
+            this.checkList = checkArr
+          },
+          handleSizeChange (val) {
+            this.pageSize = val
+            this.initCourse()
+          },
+          handleCurrentChange (val) {
+            this.page = val
+            this.initCourse()
+          }
+        }
+      })
+    </script>
+</body>
+</html>

@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author tuuli
- * @since 2023-01-11
+ * @since 2023-01-12
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

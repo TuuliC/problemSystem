@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author tuuli
- * @since 2023-01-11
+ * @since 2023-01-12
  */
 @Service
 public class TeacherServiceImpl extends ServiceImpl<TeacherDao, Teacher> implements ITeacherService {

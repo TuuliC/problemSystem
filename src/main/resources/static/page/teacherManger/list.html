@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+  <link rel="stylesheet" href="../../styles/page.css" />
+  <style>
+    .dashboard-container .container .tableBox .el-image img {
+      width: 20px;
+      border-radius: 26px;
+    }
+  </style>
+</head>
+<body>
+   <div class="dashboard-container" id="combo-app">
+    <div class="container">
+      <div class="tableBar">
+        <el-input
+          v-model="input"
+          placeholder="请输入姓名"
+          style="width: 250px"
+          clearable
+          @keyup.enter.native="handleQueryTeacher"
+        >
+        </el-input>
+
+        <span v-if ="input !== ''" style="height: 40px">
+        <el-button
+                type="text"
+                style="margin-right: 560px"
+                @click="initTeacher"
+        >
+          <img src="../../images/icons/sreach.png" style="width: 20px;height: 20px;margin-top: 0px;" />
+        </el-button>
+        </span>
+
+        <div class="tableLab">
+          <el-button
+               type="text"
+               size="small"
+              style="color: #fdd24c;border-right: solid 1px #d8dde3;"
+              @click="deleteHandleTeacher('批量')"
+          >
+            批量删除&nbsp&nbsp&nbsp
+          </el-button>
+
+          <el-button
+                  type="text"
+                  size="small"
+                  style="color: #85ce61;border-right: solid 1px #d8dde3;"
+                  @click="deleteHandleTeacher('1')"
+          >
+            批量启用&nbsp&nbsp&nbsp
+          </el-button>
+
+          <el-button
+            type="text"
+            style="color: #f56c6c"
+            @click="statusHandle('0')"
+          >批量停用</el-button>
+
+          <el-button
+            type="primary"
+            style="background: #8cc5ff"
+            @click="addTeachers('add')"
+            icon="el-icon-plus"
+          >
+            添加教师
+          </el-button>
+        </div>
+      </div>
+      <el-table
+        :data="tableData"
+        stripe
+        width="500"
+        class="tableBox"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column
+          type="selection"
+          width="80"
+        ></el-table-column>
+        <el-table-column
+                prop="id"
+                width="130"
+                label="教师编号"
+        ></el-table-column>
+        <el-table-column
+          prop="name"
+          width="150"
+          label="教师姓名"
+        ></el-table-column>
+        <el-table-column
+                prop="sex"
+                width="130"
+                label="教师性别"
+        ></el-table-column>
+        <el-table-column
+                prop="birthday"
+                width="150"
+                label="教师年龄"
+        ></el-table-column>
+        <el-table-column
+                prop="inTime"
+                width="200"
+                label="入职时间"
+        ></el-table-column>
+        <el-table-column label="状态">
+          <template slot-scope="scope">
+            <span>{{ scope.row.status === '0' ? '停用' : '启用' }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column
+          label="操作"
+          width="260"
+          align="center"
+        >
+          <template slot-scope="scope">
+
+            <el-button
+                type="text"
+                @click="addTeachers(scope.row.id)"
+            >
+              <img src="../../images/icons/edit.png" style="width: 20px;height: 20px" />
+            </el-button>
+
+            <el-button
+              type="text"
+              @click="statusHandleTeacher(scope.row)"
+            >
+              <!--{{ scope.row.status === '0' ? '启用' : '停用' }}-->
+              <span v-if="scope.row.status === '0'">
+                <el-image src="../../images/icons/start.png"  style="width: 20px;height: 20px"></el-image>
+              </span>
+              <span v-else>
+                <el-image src="../../images/icons/stop.png"  style="width: 20px;height: 20px"></el-image>
+              </span>
+            </el-button>
+            <el-button
+               type="text"
+              @click="deleteHandleTeacher('单删', scope.row.id)"
+            >
+              <img src="../../images/icons/del.png" style="width: 20px;height: 20px" />
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        class="pageList"
+        :page-sizes="[10, 20, 30, 40]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="counts"
+        @size-change="handleSizeChange"
+        :current-page.sync="page"
+        @current-change="handleCurrentChange"
+      ></el-pagination>
+    </div>
+  </div>
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="../../plugins/vue/vue.js"></script>
+    <!-- 引入组件库 -->
+    <script src="../../plugins/element-ui/index.js"></script>
+    <!-- 引入axios -->
+    <script src="../../plugins/axios/axios.min.js"></script>
+    <script src="../../js/request.js"></script>
+    <script src="../../api/teacher.js"></script>
+    <script>
+      new Vue({
+        el: '#combo-app',
+        data() {
+          return {
+             input: '',
+             counts: 0,
+             page: 1,
+             pageSize: 10,
+             tableData : [],
+          }
+        },
+        computed: {},
+        created() {
+          /**
+           * 加载页面时进行初始化
+           * */
+          this.initTeacher()
+        },
+        mounted() {
+        },
+        methods: {
+          async initTeacher () {
+            const params = {
+              page: this.page,
+              pageSize: this.pageSize,
+              name: this.input ? this.input : undefined
+            }
+            await getTeacherPage(params).then(res => {
+              if (String(res.code) === '1') {
+                this.tableData = res.data.list || []
+                this.counts = res.data.total
+              }
+            }).catch(err => {
+              this.$message.error('请求出错了：' + err)
+            })
+          },
+          /**
+           * 页面初始页码
+           * */
+          handleQueryTeacher() {
+            this.page = 1;
+            this.initTeacher();
+          },
+          // 添加
+          addTeachers(st) {
+            if (st === 'add'){
+              window.parent.menuHandle({
+                id: '3',
+                url: 'page/teacherManger/add.html',
+                name: '添加教师'
+              },true)
+            } else {
+              window.parent.menuHandle({
+                id: '3',
+                url: 'page/teacherManger/add.html?id='+st,
+                name: '修改教师信息'
+              },true)
+            }
+          },
+
+          // 删除
+          deleteHandleTeacher (type, id) {
+            if (type === '批量' && id === null) {
+              if (this.checkList.length === 0) {
+                return this.$message.error('请选择删除对象')
+              }
+            }
+            this.$confirm('确定删除该教师, 是否继续?', '确定删除', {
+              'confirmButtonText': '确定',
+              'cancelButtonText': '取消',
+            }).then(() => {
+              deleteTeacher(type === '批量' ? this.checkList.join(',') : id).then(res => {
+                if (res.code === 1) {
+                  if(res.data === 'success')
+                    this.$message.success('删除成功！');
+                  else
+                    this.$message.error(res.data);
+                  this.handleQueryTeacher()
+                } else {
+                  this.$message.error(res.msg || '操作失败')
+                }
+              }).catch(err => {
+                this.$message.error('请求出错了：' + err)
+              })
+            })
+          },
+
+          //状态更改
+          statusHandleTeacher (row) {
+            let params = {}
+            if (typeof row === 'string' ){
+              if (this.checkList.length === 0){
+                this.$message.error('批量操作，请先勾选操作！')
+                return false
+              }
+              params.ids = this.checkList.join(',')
+              params.status = row
+            } else {
+              params.ids = row.id
+              params.status = row.status ? '0' : '1'
+            }
+            this.$confirm('确认更改该教师状态?', '提示', {
+              'confirmButtonText': '确定',
+              'cancelButtonText': '取消',
+              'type': 'warning'
+            }).then(() => {
+              // 起售停售---批量起售停售接口
+             TeacherStatusByStatus(params).then(res => {
+                if (res.code === 1) {
+                  this.$message.success('教师状态已经更改成功！')
+                  this.handleQueryTeacher()
+                } else {
+                  this.$message.error(res.msg || '操作失败')
+                }
+              }).catch(err => {
+                  this.$message.error('请求出错了：' + err)
+              })
+            })
+          },
+
+          // 全部操作
+          handleSelectionChange (val){
+            let checkArr = []
+            val.forEach((n) => {
+              checkArr.push(n.id)
+            })
+            this.checkList = checkArr
+          },
+          handleSizeChange (val) {
+            this.pageSize = val
+            this.initTeacher()
+          },
+          handleCurrentChange (val) {
+            this.page = val
+            this.initTeacher()
+          }
+        }
+      })
+    </script>
+</body>
+</html>

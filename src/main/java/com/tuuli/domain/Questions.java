@@ -14,7 +14,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author tuuli
- * @since 2023-01-11
+ * @since 2023-01-12
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -34,7 +34,7 @@ public class Questions implements Serializable {
 
     private String answer;
 
-    private Integer ques_cour;
+    private Integer quesCour;
 
     private String chapter;
 
@@ -42,6 +42,8 @@ public class Questions implements Serializable {
     private Integer delete;
 
     private Integer hard;
+
+    private Integer score;
 
 
 }

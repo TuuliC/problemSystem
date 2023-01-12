@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="../../plugins/element-ui/index.css" />
+    <link rel="stylesheet" href="../../styles/page.css" />
+    <style>
+      .el-button--primary {
+        color: #333333;
+        background-color: #a4da89;
+        border-color: #a4da89;
+      }
+      .continue {
+        border-color: #333333 !important;
+        background: #333333 !important;
+        color: #ffffff !important;
+      }
+      .continue:hover {
+        background-color: #999999 !important;
+        border-color: #999999 !important;
+        color: #ffffff !important;
+      }
+      .continue:active {
+        background-color: #2a2a2a !important;
+        border-color: #2a2a2a !important;
+        color: #ffffff !important;
+      }
+      element.style {
+        margin-right: 650px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="addBrand-container" id="combo-add-app">
+      <div class="container">
+        <el-form
+          ref="ruleForm"
+          :model="ruleForm"
+          :rules="rules"
+          :inline="false"
+          label-width="460px"
+        >
+          <div>
+            <el-form-item label="学生姓名:" prop="name">
+              <el-input v-model="ruleForm.name" placeholder="请填写学生姓名" maxlength="20"/>
+            </el-form-item>
+            <el-form-item label="学生性别:" prop="sex" >
+              <el-select v-model="ruleForm.sex" placeholder="请选择学生性别">
+                <el-option
+                        v-for="item in options"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+
+            <el-form-item label="学生年龄" prop="birthday">
+              <el-input v-model="ruleForm.birthday" placeholder="学生年龄" maxlength="20"/>
+
+            </el-form-item>
+            <el-form-item label="入学时间:" prop="inTime" >
+              <el-date-picker
+                      v-model="ruleForm.inTime"
+                      type="year"
+                      placeholder="请填写入学时间"
+                      format="yyyy">
+              </el-date-picker>
+            </el-form-item>
+            <el-form-item label="所在班级:" prop="cla" >
+              <el-select v-model="ruleForm.cla" placeholder="请选择班级" @change="$forceUpdate()">
+                <el-option
+                        v-for="item in classes"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="学生账号:" prop="count" >
+              <el-input v-model="ruleForm.count" placeholder="请填写账号" maxlength="20"/>
+            </el-form-item>
+          </div>
+
+          <div>
+            <el-form-item
+              label-width="400px"
+            >
+              <el-button @click="goBackaddPageStudent()"> 取消 </el-button>
+              <el-button type="primary" @click="submitFormaddPageStudent('ruleForm', false)"> 保存 </el-button>
+              <el-button
+                v-if="actionType == 'add'"
+                type="primary"
+                class="continue"
+                @click="submitFormaddPageStudent('ruleForm', true)"
+              >
+                保存并继续添加
+              </el-button>
+            </el-form-item>
+          </div>
+        </el-form>
+      </div>
+
+    </div>
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="../../plugins/vue/vue.js"></script>
+    <!-- 引入组件库 -->
+    <script src="../../plugins/element-ui/index.js"></script>
+    <!-- 引入axios -->
+    <script src="../../plugins/axios/axios.min.js"></script>
+    <script src="../../js/request.js"></script>
+    <script src="../../api/student.js"></script>
+    <script src="../../js/validate.js"></script>
+    <script src="../../js/index.js"></script>
+    <script>
+      new Vue({
+        el: '#combo-add-app',
+        data() {
+          return {
+            id:'',
+            actionType: '',
+            ruleForm: {
+              id:'',
+              name:'',
+              sex:'',
+              birthday:'',
+              code:'',
+              inTime:'',
+              count:'',
+              cla:''
+            },
+            options:[
+              {
+              label:'男', value:'1'
+            },
+              {label:'女',value:'0'}
+            ],
+            classes:[],
+
+          }
+        },
+        computed: {
+          rules() {
+            return {
+              name: {
+                required: true,
+                message: '请输入学生姓名',
+                trigger: 'blur',
+              },
+              sex:{
+                required: true,
+                message: '请选择性别',
+                trigger: 'blur',
+              },
+              inTime:{
+                required: true,
+                message: '请输入入职时间',
+                trigger: 'blur',
+              },
+              birthday:{
+                required: true,
+                message: '请输入年龄',
+                trigger: 'blur',
+              }
+
+            }
+          },
+
+        },
+        watch:{
+
+        },
+        created() {
+          this.getClassaddPageStudent();
+          this.id = requestUrlParam('id');
+          this.actionType = this.id ? 'edit' : 'add'
+          if (this.id) {
+            this.initaddPageStudent()
+          }
+        },
+        mounted() {},
+        methods: {
+          async initaddPageStudent() {
+            queryStudentById(this.id).then((res) => {
+              if (String(res.code) === '1') {
+               this.ruleForm = res.data;
+              } else {
+                this.$message.error(res.msg || '操作失败')
+              }
+            })
+          },
+          getClassaddPageStudent(){
+            getClasses().then((res) => {
+              if(res.code === 1){
+                this.classes = res.data.map((obj) =>({ ...obj,cla : obj.id}))
+              }
+            })
+          },
+
+          submitFormaddPageStudent(formName, st) {
+                let prams = this.ruleForm
+                let strings = prams.inTime.split('-');
+                prams.inTime = strings[0];
+                if (this.actionType === 'add') {
+                  addStudent(prams,prams.count)
+                    .then((res) => {
+                      if (res.code === 1) {
+                        this.$message.success('添加成功！')
+                        if (!st) {
+                          this.goBack()
+                        } else {
+                          this.ruleForm = {
+                            id:'',
+                            name:'',
+                            sex:'',
+                            birthday:'',
+                            inTime:'',
+                            count:''
+                          }
+                        }
+                      } else {
+                        this.$message.error(res.msg || '操作失败')
+                      }
+                    })
+                    .catch((err) => {
+                      this.$message.error('请求出错了：' + err)
+                    })
+                } else {
+                  editStudent(prams)
+                    .then((res) => {
+                      if (res.code === 1) {
+                        this.$message.success('修改成功！')
+                        this.goBack()
+                      } else {
+                        this.$message.error(res.msg || '操作失败')
+                      }
+                    })
+                    .catch((err) => {
+                      this.$message.error('请求出错了：' + err)
+                    })
+                }
+
+          },
+          handleAvatarSuccess (response, file, fileList) {
+            // this.imageUrl = response.data
+            if(response.code === 0 && response.msg === '未登录'){
+              window.top.location.href = '/backend/page/login/login.html'
+            }else{
+              this.imageUrl = `/common/download?name=${response.data}`
+              this.ruleForm.image = response.data
+            }
+          },
+
+          goBackaddPageStudent() {
+            window.parent.menuHandle(
+              {
+                id: '2',
+                url: 'page/studentManger/list.html',
+                name: '学生管理',
+              },
+              false
+            )
+          },
+
+        },
+      })
+    </script>
+  </body>
+</html>
