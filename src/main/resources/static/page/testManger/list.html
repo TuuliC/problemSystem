@@ -203,14 +203,13 @@
             this.initTest()
         },
         mounted() {
-
         },
         methods: {
 
             selectAll() {
                 axios({
                     method: "post",
-                    url: "/questions",
+                    url: "/questions/selectAll",
                     data: this.question
                 }).then(resp => {
                     this.tableData = resp.data.rows;
@@ -243,6 +242,7 @@
             handleQueryTest() {
                 this.page = 1;
                 this.initTest();
+                /*this.selectAll();*/
             },
             // 添加
             addTest(st) {
@@ -300,10 +300,12 @@
             handleSizeChange(val) {
                 this.pageSize = val
                 this.initTest()
+               /* this.selectAll();*/
             },
             handleCurrentChange(val) {
                 this.page = val
                 this.initTest()
+                /*this.selectAll();*/
             }
         }
     })

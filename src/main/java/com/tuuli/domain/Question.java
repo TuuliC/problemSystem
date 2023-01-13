@@ -1,9 +1,7 @@
 package com.tuuli.domain;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,7 +17,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName("tb_questions")
-public class Questions implements Serializable {
+public class Question implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +31,7 @@ public class Questions implements Serializable {
     private String option;
 
     private String answer;
-
+    @TableField(value = "ques_cour")
     private Integer quesCour;
 
     private String chapter;

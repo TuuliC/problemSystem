@@ -1,9 +1,9 @@
 // 查询列表数据
 const getTestPage = (params) => {
   return $axios({
-    url: '/test/page',
+    url: '/questions/page',
     method: 'get',
-    params
+    params: { params }
   })
 }
 

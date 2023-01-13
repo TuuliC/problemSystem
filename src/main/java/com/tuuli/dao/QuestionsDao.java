@@ -1,7 +1,8 @@
 package com.tuuli.dao;
 
-import com.tuuli.domain.Questions;
+import com.tuuli.domain.Question;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * <p>
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author tuuli
  * @since 2023-01-12
  */
-public interface QuestionsDao extends BaseMapper<Questions> {
+@Mapper
+public interface QuestionsDao extends BaseMapper<Question> {
 
 }
