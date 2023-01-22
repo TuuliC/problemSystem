@@ -35,7 +35,7 @@ public class Teacher implements Serializable {
     private String college;
 
     @TableLogic
-    private Integer delete;
+    private Integer deleted;
 
 
 }

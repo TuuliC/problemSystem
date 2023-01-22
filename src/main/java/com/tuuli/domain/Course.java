@@ -1,10 +1,10 @@
 package com.tuuli.domain;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,10 +28,12 @@ public class Course implements Serializable {
 
     private String name;
 
-    private String describe;
+    private String description;
+
+    @TableField(exist = false)
+    private String teaNamesStr;
 
     @TableLogic
-    private String delete;
-
+    private String deleted;
 
 }

@@ -21,14 +21,15 @@
         <div class="tableBar">
             <el-input
                     v-model="input"
-                    placeholder="请输入题目名称"
+                    placeholder="请输入题目描述"
                     style="width: 250px"
                     clearable
+                    clearable @clear="initTest()"
                     @keyup.enter.native="handleQueryTest"
             >
             </el-input>
 
-            <span v-if="input !== ''" style="height: 40px">
+            <span style="height: 40px">
         <el-button
                 type="text"
                 style="margin-right: 560px"
@@ -88,47 +89,50 @@
                     width="80"
             ></el-table-column>
             <el-table-column
-                    prop="id"
-                    width="130"
-                    label="题目编号"
+                    type="index"
+                    width="80"
+                    label="序号"
             ></el-table-column>
             <el-table-column
-                    prop="describe"
-                    width="350"
+                    prop="description"
+                    width="300"
                     label="题目描述"
             ></el-table-column>
             <el-table-column
-                    prop=""
-                    width="200"
+                    prop="picture"
+                    width="150"
                     label="题目图片"
             ></el-table-column>
             <el-table-column
+                    prop="options"
+                    width="250"
+                    label="选项"
+            ></el-table-column>
+            <el-table-column
                     prop="answer"
-                    width="150"
+                    width="100"
                     label="答案"
             ></el-table-column>
             <el-table-column
-                    prop="quesCour"
-                    width="200"
+                    prop="quesCourStr"
+                    width="150"
                     label="所属课程"
             ></el-table-column>
             <el-table-column
                     prop="chapter"
-                    width="200"
+                    width="150"
                     label="所属章节"
             ></el-table-column>
             <el-table-column
                     prop="hard"
-                    width="150"
+                    width="100"
                     label="难度"
             ></el-table-column>
             <el-table-column
                     prop="score"
-                    width="150"
+                    width="100"
                     label="分值"
             ></el-table-column>
-
-
             <el-table-column
                     label="操作"
                     width="100"
@@ -181,17 +185,6 @@
                 counts: 0,
                 page: 1,
                 pageSize: 10,
-                question: {
-                    id: "",
-                    description: "",
-                    picture: "",
-                    option: "",
-                    answer: "",
-                    quesCour: "",
-                    chapter: "",
-                    hard: "",
-                    score: ""
-                },
                 tableData: [],
             }
         },
@@ -205,19 +198,6 @@
         mounted() {
         },
         methods: {
-
-            selectAll() {
-                axios({
-                    method: "post",
-                    url: "/questions/selectAll",
-                    data: this.question
-                }).then(resp => {
-                    this.tableData = resp.data.rows;
-                    /*this.totalCount = resp.data.totalCount;*/
-                    this.totalCount = 2;
-                })
-            },
-
 
             async initTest() {
                 const params = {

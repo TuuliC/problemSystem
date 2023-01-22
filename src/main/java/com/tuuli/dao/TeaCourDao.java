@@ -1,6 +1,6 @@
 package com.tuuli.dao;
 
-import com.tuuli.domain.Tea_cour;
+import com.tuuli.domain.TeaCour;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2023-01-12
  */
 @Mapper
-public interface Tea_courDao extends BaseMapper<Tea_cour> {
+public interface TeaCourDao extends BaseMapper<TeaCour> {
 
 }

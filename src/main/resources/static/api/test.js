@@ -3,7 +3,7 @@ const getTestPage = (params) => {
   return $axios({
     url: '/questions/page',
     method: 'get',
-    params: { params }
+    params: params
   })
 }
 
@@ -28,9 +28,12 @@ const editTest = (params) => {
 // 新增数据接口
 const addTest = (params) => {
   return $axios({
-    url: '/test/add',
+    url: '/questions/add',
     method: 'post',
-    data: { params }
+    data: params,
+    //dataType:'json',
+    //contentType:'application/json;charset=utf-8',
+    //headers: { 'Content-Type': 'application/json;charset=UTF-8'}
   })
 }
 
@@ -44,6 +47,12 @@ const queryTestById = (id) => {
 const getTypes =() =>{
   return $axios({
     url:'/test/category',
+    method:'get'
+  })
+}
+const getCourses =() =>{
+  return $axios({
+    url:'/course/getAll',
     method:'get'
   })
 }

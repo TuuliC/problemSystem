@@ -24,20 +24,24 @@ public class Question implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    private String describe;
+    private String description;
 
     private String picture;
 
-    private String option;
+    private String options;
 
     private String answer;
+
     @TableField(value = "ques_cour")
-    private Integer quesCour;
+    private Integer quesCourId;
+
+    @TableField(exist = false)
+    private String quesCourStr;
 
     private String chapter;
 
     @TableLogic
-    private Integer delete;
+    private Integer deleted;
 
     private Integer hard;
 
