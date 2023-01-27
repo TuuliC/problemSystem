@@ -43,9 +43,9 @@ public class Question implements Serializable {
     @TableLogic
     private Integer deleted;
 
-    private Integer hard;
+    private String hard;
 
-    private Integer score;
+    private Double score;
 
 
 }

@@ -3,9 +3,6 @@ package com.tuuli.dto;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author tuuli
  * @time Created in 2023/1/18 23:09
@@ -14,13 +11,12 @@ import java.util.Map;
 @Data
 public class QuestionDto {
     String description;
-    //List options;
-    String options;
+    String[] options;
     String answer;
     Integer quesCourId;
     String chapter;
     String hard;
-    Integer score;
+    Double score;
     String type;
     MultipartFile[] file;
 }

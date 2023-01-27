@@ -78,6 +78,7 @@
         <el-table
                 :data="tableData"
                 stripe
+                :border="true"
                 width="500"
                 class="tableBox"
                 @selection-change="handleSelectionChange"
@@ -102,7 +103,11 @@
                     prop="picture"
                     width="150"
                     label="题目图片"
-            ></el-table-column>
+            >
+                <template slot-scope="scope">
+                    <img :src="scope.row.picture" width="100"/>
+                </template>
+            </el-table-column>
             <el-table-column
                     prop="options"
                     width="250"
@@ -194,6 +199,7 @@
              * 加载页面时进行初始化
              * */
             this.initTest()
+
         },
         mounted() {
         },
@@ -207,9 +213,21 @@
                 }
                 await getTestPage(params).then(res => {
                     if (String(res.code) === '1') {
-                        //alert(res.data)
                         this.tableData = res.data.list || []
                         this.counts = res.data.total
+                        for (var i = 0; i < res.data.list.length; i++) {
+                            if (res.data.list[i].picture) {
+                                res.data.list[i].picture = "../../questionsImages/" + res.data.list[i].picture
+                            }
+                            if (res.data.list[i].options) {
+                                var arr = res.data.list[i].options.split('#,;%*@')
+                                res.data.list[i].options=''
+                                for (var j=0;j<arr.length;j++){
+                                    res.data.list[i].options+="选项"+(j+1)+":"+arr[j]+"; "
+                                }
+                            }
+                        }
+
                     }
                 }).catch(err => {  //
                     this.$message.error('请求出错了：' + err)

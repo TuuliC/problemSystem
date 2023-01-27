@@ -136,7 +136,7 @@
             </el-form-item>
 
             <el-form-item label="题目分值" prop="score">
-                <el-input-number v-model="ruleForm.grade" controls-position="" step-strictly="true" :precision="1"
+                <el-input-number v-model="ruleForm.score" controls-position="" :step-strictly="true" :precision="1"
                                  placeholder="0.0" :step="0.5" :min="0" :max="100" style="width: 293px"></el-input-number>
             </el-form-item>
 
@@ -179,7 +179,7 @@
                 id: '',
                 actionType: '',
 
-                formData: '',
+                formData: [],
                 previewPath: '',
                 previewVisible: false,
                 hideUpload: false,
@@ -198,6 +198,7 @@
                     description: '',
                     picture: [{}],
                     options: [{}],
+                    options1:[],
                     answer: '',
                     quesCourId: '',
                     chapter: '',
@@ -305,14 +306,10 @@
 
             },
             uploadChange(file, fileList) {
-                this.hideUpload = fileList.length >= this.limitCount;
+                //this.hideUpload = fileList.length >= this.limitCount;
                 this.headFile = file;
                 this.headFileList = fileList;
-                /*if (fileList.length == 1) {
-                    let {headImg, ...data} = this.kfFormRules; //删除kfFormRules中的headImg属性
-                    this.kfFormRules = data;
-                }*/
-                this.$refs.kfFormRef.clearValidate('headImg');
+                //this.$refs.kfFormRef.clearValidate('headImg');
                 this.hideUpload = fileList.length >= this.limitCount;
             },
 
@@ -362,19 +359,18 @@
             submitFormAddTest(formName, st) {
 
                 this.formData = new FormData;
+                for (var i = 0;i<this.ruleForm.options.length;i++){
+                    this.ruleForm.options1.push(this.ruleForm.options[i].value)
+                }
                 this.$refs.imgForm.submit();//触发上传图片，开始一张一张的执行每个图片的http-request，遍历完成后此时的formData中的‘file’对应的就是待上传的图片对象数组了
                 this.formData.append('description', this.ruleForm.description);
-                this.formData.append('options', JSON.stringify(this.ruleForm.options));
+                this.formData.append('options', this.ruleForm.options1);
                 this.formData.append('answer', this.ruleForm.answer);
                 this.formData.append('quesCourId', this.ruleForm.quesCourId);
                 this.formData.append('chapter', this.ruleForm.chapter);
                 this.formData.append('hard', this.ruleForm.hard);
                 this.formData.append('score', this.ruleForm.score);
                 this.formData.append('type', this.ruleForm.type);
-
-                //alert( JSON.parse(JSON.stringify(this.ruleForm.options)))
-                //console.log(JSON.parse(JSON.stringify(this.ruleForm.options)))
-                //console.log(this.formData)
 
                 let prams = this.formData;
 
@@ -384,18 +380,28 @@
                             if (res.code === 1) {
                                 this.$message.success('添加成功！')
                                 if (!st) {
-                                    this.goBack()
+                                    setTimeout(() => {
+                                        this.goBackAddTest()
+                                    }, 2200);
                                 } else {
-                                    this.ruleForm = {
-                                        description: '',
-                                        picture: '',
-                                        options: [],
-                                        answer: '',
-                                        quesCourId: '',
-                                        chapter: '',
-                                        hard: '',
-                                        score: '',
-                                    }
+                                    setTimeout(() => {
+                                        this.ruleForm = {
+                                            description: '',
+                                            picture: [{}],
+                                            options: [{}],
+                                            options1:[],
+                                            answer: '',
+                                            quesCourId: '',
+                                            chapter: '',
+                                            hard: '',
+                                            score: '0',
+                                            type: '',
+                                        }
+                                        this.$refs.imgForm.clearFiles();
+                                        this.headFile= ''
+                                        this.headFileList= ''
+                                        this.hideUpload = this.headFileList.length >= this.limitCount;
+                                    }, 2000);
                                 }
                             } else {
                                 this.$message.error(res.msg || '操作失败')

@@ -41,4 +41,9 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
 
         return t;
     }
+
+    @Override
+    public void add(Question question) {
+        questionsDao.insert(question);
+    }
 }
