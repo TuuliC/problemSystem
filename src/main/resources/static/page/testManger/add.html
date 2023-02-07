@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
@@ -240,29 +240,19 @@
                         message: '请输入题目描述',
                         trigger: 'blur',
                     },
-                    options: {
-                        required: true,
-                        message: '请输入题目描述',
-                        trigger: 'blur',
-                    },
                     quesCourId: {
                         required: true,
                         message: '请选择题目所属课程',
                         trigger: 'blur',
                     },
-                    type: {
-                        required: true,
-                        message: '请输入题目所属章节',
-                        trigger: 'blur',
-                    },
-                    hard: {
-                        required: true,
-                        message: '请选择难度',
-                        trigger: 'blur',
-                    },
                     score: {
                         required: true,
                         message: '请输入分数',
+                        trigger: 'blur',
+                    },
+                    type: {
+                        required: true,
+                        message: '请选择题目类型',
                         trigger: 'blur',
                     },
 
@@ -290,12 +280,13 @@
                             this.flag = true;
                             this.oldFileName = res.data.picture;
                             this.headFileList = [];
-                            this.headFileList.push({url: "http://localhost:8080/myImages/" + res.data.picture})
+                            this.headFileList.push({url: "../../myImages/" + res.data.picture})
                             this.hideUpload = this.headFileList.length >= this.limitCount;
                         }
-                        if (res.data.options.length!==0) {
+                        if (res.data.options.length !== 0) {
                             this.ruleForm.options = res.data.options.map((obj) => ({value: obj}))
                         }
+                        else this.ruleForm.options = [{value: ''}];
                     } else {
                         this.$message.error(res.msg || '操作失败')
                     }
@@ -371,10 +362,19 @@
 
 
             submitFormAddTest(formName, st) {
+                let isExit = false;
+                this.$refs.ruleForm.validate(valid => {
+                    if (!valid) {
+                        //如果校验为真说明符合要求可以继续
+                        //反正说明校验失败，返回对应的message
+                        isExit = true;
+                    }
+                });
+                if (isExit) return;
 
                 this.formData = new FormData;
                 if (this.ruleForm.type == '选择题') {
-                    this.ruleForm.options1=[]
+                    this.ruleForm.options1 = []
                     for (var i = 0; i < this.ruleForm.options.length; i++) {
                         this.ruleForm.options1.push(this.ruleForm.options[i].value)
                     }

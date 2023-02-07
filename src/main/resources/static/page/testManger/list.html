@@ -53,7 +53,7 @@
                         type="text"
                         size="small"
                         style="color: #85ce61;border-right: solid 1px #d8dde3;"
-                        @click="deleteHandleTest('1')"
+                        @click="open()"
                 >
                     批量启用&nbsp&nbsp&nbsp
                 </el-button>
@@ -61,7 +61,7 @@
                 <el-button
                         type="text"
                         style="color: #f56c6c"
-                        @click="statusHandleTest('0')"
+                        @click="open()"
                 >批量停用
                 </el-button>
 
@@ -87,16 +87,16 @@
         >
             <el-table-column
                     type="selection"
-                    width="80"
+                    width="50"
             ></el-table-column>
             <el-table-column
                     type="index"
-                    width="80"
+                    width="50"
                     label="序号"
             ></el-table-column>
             <el-table-column
                     prop="type"
-                    width="140"
+                    width="80"
                     label="题目类型"
             ></el-table-column>
             <el-table-column
@@ -110,7 +110,7 @@
                     label="题目图片"
             >
                 <template slot-scope="scope">
-                    <img :src="scope.row.picture" width="100"/>
+                    <img v-if="scope.row.picture" :src="scope.row.picture" alt="图片展示失败" width="100"/>
                 </template>
             </el-table-column>
             <el-table-column
@@ -125,22 +125,22 @@
             ></el-table-column>
             <el-table-column
                     prop="quesCourStr"
-                    width="140"
+                    width="00"
                     label="所属课程"
             ></el-table-column>
             <el-table-column
                     prop="chapter"
-                    width="140"
+                    width="90"
                     label="所属章节"
             ></el-table-column>
             <el-table-column
                     prop="hard"
-                    width="100"
+                    width="60"
                     label="难度"
             ></el-table-column>
             <el-table-column
                     prop="score"
-                    width="100"
+                    width="60"
                     label="分值"
             ></el-table-column>
             <el-table-column
@@ -196,6 +196,7 @@
                 page: 1,
                 pageSize: 10,
                 tableData: [],
+                checkList: []
             }
         },
         computed: {},
@@ -222,7 +223,7 @@
                         this.counts = res.data.total
                         for (var i = 0; i < res.data.list.length; i++) {
                             if (res.data.list[i].picture != null && res.data.list[i].picture !== '') {
-                                res.data.list[i].picture = "http://localhost:8080/myImages/" + res.data.list[i].picture
+                                res.data.list[i].picture = "../../myImages/" + res.data.list[i].picture
                             }
                             var string = ''
                             if (res.data.list[i].type === '选择题') {
@@ -245,7 +246,6 @@
             handleQueryTest() {
                 this.page = 1;
                 this.initTest();
-                /*this.selectAll();*/
             },
             // 添加
             addTest(st) {
@@ -266,7 +266,7 @@
 
             // 删除
             deleteHandleTest(type, id) {
-                if (type === '批量' && id === null) {
+                if (type === '批量' && id === undefined) {
                     if (this.checkList.length === 0) {
                         return this.$message.error('请选择删除对象')
                     }
@@ -303,13 +303,18 @@
             handleSizeChange(val) {
                 this.pageSize = val
                 this.initTest()
-                /* this.selectAll();*/
             },
             handleCurrentChange(val) {
                 this.page = val
                 this.initTest()
-                /*this.selectAll();*/
+            },
+
+            open() {
+                this.$alert('没有这个功能', '别乱点', {
+                    confirmButtonText: '确定',
+                });
             }
+
         }
     })
 </script>

@@ -33,7 +33,7 @@ public class QuestionsController {
 
     @GetMapping("/page")
     public R<QuestionsManger> getPage(Integer page, Integer pageSize, String name) {
-        QuestionsManger page1 = questionsService.getPage(page - 1, pageSize, name);
+        QuestionsManger page1 = questionsService.getPage(page, pageSize, name);
         //将其中的课程id转为课程名称
         for (Question q : page1.getList()) {
             if (q.getQuesCourId() != null && q.getQuesCourId() != 0) {
@@ -75,8 +75,6 @@ public class QuestionsController {
 
     @PostMapping("/update")
     public R<String> update(Question question, @RequestParam("isEditFile") String isEditFile) throws IOException {
-        System.out.println(question);
-        System.out.println("------------");
         if (Objects.equals(isEditFile, "false")) {
             //
         } else if (isEditFile.startsWith("del")) {
@@ -92,7 +90,6 @@ public class QuestionsController {
             String newFileName = savePicture(question.getFile());
             question.setPicture(newFileName);
         }
-        System.out.println(question);
         questionsService.update(question);
         return R.success("success");
     }
@@ -103,7 +100,6 @@ public class QuestionsController {
         //为防止文件重名被覆盖，为每个文件都生成不同的名字
         UUID uuid = UUID.randomUUID();//生成一个唯一标识符
         String newFileName = uuid.toString().replaceAll("-", "") + suffixName;
-        //System.out.println("新文件名newFileName：" + newFileName);
 
         // 文件上传后存储的位置
         File savePos = new File("src/main/resources/static/questionsImages");
@@ -113,6 +109,7 @@ public class QuestionsController {
         File dir = new File(realPath, newFileName);//创建文件流，对文件操作
         File filepath = new File(realPath);
         if (!filepath.exists()) {
+            //路径不存在则创建
             filepath.mkdirs();
         }
         file.transferTo(dir);//将文件 传送到前创建的文件流（把图片写进去）

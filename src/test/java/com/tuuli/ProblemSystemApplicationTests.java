@@ -11,13 +11,14 @@ import java.io.IOException;
 @SpringBootTest
 class ProblemSystemApplicationTests {
 
-
     @Test
     void contextLoads() {
+        File savePos = new File("src/main/resources/static/questionsImages");
+        // 获取存放位置的规范路径
         try {
-            File staticDir = new File(ResourceUtils.getURL("classpath:static").getPath());
-            System.out.println(staticDir.getPath() + "\\questionsImages\\");
-        } catch (FileNotFoundException e) {
+            String realPath = savePos.getCanonicalPath();
+            System.out.println(realPath);
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

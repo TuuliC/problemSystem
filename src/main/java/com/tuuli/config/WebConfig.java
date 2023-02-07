@@ -30,9 +30,23 @@ public class WebConfig implements WebMvcConfigurer {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        String path="D:\\work\\javaidea\\Project\\problemSystem\\src\\main\\resources\\static\\questionsImages\\";
-        registry.addResourceHandler("/myImages/**").addResourceLocations("file:"+staticDir.getPath() + "\\questionsImages\\");
+
+        String path = "D:\\work\\javaidea\\Project\\problemSystem\\src\\main\\resources\\static\\questionsImages\\";
+
+        String realPath = null;
+        try {
+            realPath = new File("src/main/resources/static/questionsImages").getCanonicalPath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //方法一，会出现问题，需重启后才能获取资源
+        //registry.addResourceHandler("/myImages/**").addResourceLocations("file:"+staticDir.getPath() + "\\questionsImages\\");
+        //方法二，不会出现方法一的问题，但是只能从本地获取资源
         //registry.addResourceHandler("/myImages/**").addResourceLocations("file:"+path);
+        //方法三，同方法二，区别是动态获取本地地址
+        registry.addResourceHandler("/myImages/**").addResourceLocations("file:" + realPath + "/");
 
     }
 }
