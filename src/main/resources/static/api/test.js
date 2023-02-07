@@ -10,7 +10,7 @@ const getTestPage = (params) => {
 // 删除数据接口
 const deleteTest = (ids) => {
   return $axios({
-    url: '/test',
+    url: '/questions/delete',
     method: 'delete',
     params: { ids }
   })
@@ -19,9 +19,9 @@ const deleteTest = (ids) => {
 // 修改数据接口
 const editTest = (params) => {
   return $axios({
-    url: '/test',
-    method: 'put',
-    data: { ...params }
+    url: '/questions/update',
+    method: 'post',
+    data: params,
   })
 }
 
@@ -40,7 +40,7 @@ const addTest = (params) => {
 // 查询详情接口
 const queryTestById = (id) => {
   return $axios({
-    url: `/test/query/`+ id,
+    url: `/questions/query/`+ id,
     method: 'get'
   })
 }

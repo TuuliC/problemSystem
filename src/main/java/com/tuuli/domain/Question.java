@@ -1,10 +1,12 @@
 package com.tuuli.domain;
 
 import com.baomidou.mybatisplus.annotation.*;
-
-import java.io.Serializable;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -16,7 +18,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-@TableName("tb_questions")
+@TableName(value = "tb_questions",autoResultMap = true)
 public class Question implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,7 +30,11 @@ public class Question implements Serializable {
 
     private String picture;
 
-    private String options;
+    @TableField(exist = false)
+    private MultipartFile file;
+
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private String[] options;
 
     private String answer;
 
@@ -39,6 +45,8 @@ public class Question implements Serializable {
     private String quesCourStr;
 
     private String chapter;
+
+    private String type;
 
     @TableLogic
     private Integer deleted;

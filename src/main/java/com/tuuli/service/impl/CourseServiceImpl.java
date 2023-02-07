@@ -3,14 +3,11 @@ package com.tuuli.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.tuuli.domain.Course;
-import com.tuuli.dao.CourseDao;
-import com.tuuli.domain.Question;
-import com.tuuli.domain.TeaCour;
-import com.tuuli.dto.CourseManger;
-import com.tuuli.dto.QuestionsManger;
-import com.tuuli.service.ICourseService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.tuuli.dao.CourseDao;
+import com.tuuli.domain.Course;
+import com.tuuli.dto.CourseManger;
+import com.tuuli.service.ICourseService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +46,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements
     @Override
     public String getNameById(Integer courseId) {
         LambdaQueryWrapper<Course> courseLambdaQueryWrapper = new LambdaQueryWrapper<>();//查询条件对象
-        courseLambdaQueryWrapper.select(Course::getName).eq(Course::getId, courseId);//设置查询条件
+        courseLambdaQueryWrapper.select(Course::getName).eq(Course::getId, courseId);//设置查询的字段
         Course course = courseDao.selectOne(courseLambdaQueryWrapper);
         return course.getName();
     }

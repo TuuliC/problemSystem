@@ -2,16 +2,25 @@ package com.tuuli;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.util.ResourceUtils;
 
-import java.util.Arrays;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @SpringBootTest
 class ProblemSystemApplicationTests {
 
+
     @Test
     void contextLoads() {
-       String[] strings = {"1，21,1","222"};
-        System.out.println(Arrays.toString(strings));
+        try {
+            File staticDir = new File(ResourceUtils.getURL("classpath:static").getPath());
+            System.out.println(staticDir.getPath() + "\\questionsImages\\");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

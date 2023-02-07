@@ -16,5 +16,6 @@ import org.springframework.stereotype.Controller;
 @Controller
 @RequestMapping("/tea_cour")
 public class Tea_courController {
+
 }
 

@@ -50,6 +50,6 @@ public class Generator {
         autoGenerator.setStrategy(strategyConfig);
 
 
-        autoGenerator.execute();
+        //autoGenerator.execute();
     }
 }

@@ -95,6 +95,11 @@
                     label="序号"
             ></el-table-column>
             <el-table-column
+                    prop="type"
+                    width="140"
+                    label="题目类型"
+            ></el-table-column>
+            <el-table-column
                     prop="description"
                     width="300"
                     label="题目描述"
@@ -120,12 +125,12 @@
             ></el-table-column>
             <el-table-column
                     prop="quesCourStr"
-                    width="150"
+                    width="140"
                     label="所属课程"
             ></el-table-column>
             <el-table-column
                     prop="chapter"
-                    width="150"
+                    width="140"
                     label="所属章节"
             ></el-table-column>
             <el-table-column
@@ -216,18 +221,18 @@
                         this.tableData = res.data.list || []
                         this.counts = res.data.total
                         for (var i = 0; i < res.data.list.length; i++) {
-                            if (res.data.list[i].picture) {
-                                res.data.list[i].picture = "../../questionsImages/" + res.data.list[i].picture
+                            if (res.data.list[i].picture != null && res.data.list[i].picture !== '') {
+                                res.data.list[i].picture = "http://localhost:8080/myImages/" + res.data.list[i].picture
                             }
-                            if (res.data.list[i].options) {
-                                var arr = res.data.list[i].options.split('#,;%*@')
-                                res.data.list[i].options=''
-                                for (var j=0;j<arr.length;j++){
-                                    res.data.list[i].options+="选项"+(j+1)+":"+arr[j]+"; "
+                            var string = ''
+                            if (res.data.list[i].type === '选择题') {
+                                for (var j = 0; j < res.data.list[i].options.length; j++) {
+                                    string += "选项" + (j + 1) + ":" + res.data.list[i].options[j] + "; "
                                 }
                             }
-                        }
+                            res.data.list[i].options = string
 
+                        }
                     }
                 }).catch(err => {  //
                     this.$message.error('请求出错了：' + err)
@@ -298,7 +303,7 @@
             handleSizeChange(val) {
                 this.pageSize = val
                 this.initTest()
-               /* this.selectAll();*/
+                /* this.selectAll();*/
             },
             handleCurrentChange(val) {
                 this.page = val

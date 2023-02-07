@@ -18,5 +18,5 @@ public class QuestionDto {
     String hard;
     Double score;
     String type;
-    MultipartFile[] file;
+    MultipartFile file;
 }
