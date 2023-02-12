@@ -15,7 +15,7 @@ import com.tuuli.dto.QuestionsManger;
 public interface IQuestionsService extends IService<Question> {
     QuestionsManger getPage(Integer page, Integer pageSize, String name);
     void add(Question question);
-    void deleteById(Integer[] ids);
+    void deleteByIds(Integer[] ids);
     Question queryById(Integer id);
     void update(Question question);
     String getPictureById(Integer id);

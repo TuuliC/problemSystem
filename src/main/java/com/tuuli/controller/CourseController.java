@@ -39,7 +39,10 @@ public class CourseController {
     @GetMapping("/page")
     public R<CourseManger> getPage(Integer page, Integer pageSize, String name){
         CourseManger page1 = courseService.getPage(page - 1, pageSize, name);
-        //查询管理该课程的老师
+        /*
+        查询共同管理该课程的老师
+        TODO 该方法效率极低，后续考虑优化或删掉该功能
+         */
         for (Course q : page1.getList()) {
             List<String> teaNamesList = teaCourService.getTeaNamesByCourId(q.getId());
             q.setTeaNamesStr(String.join(",",teaNamesList));
@@ -47,6 +50,10 @@ public class CourseController {
         return R.success(page1);
     }
 
+    /**
+     * 查询所有的课程id和课程名称，用于新增题目中选择题目所属课程的展示
+     * @return
+     */
     @GetMapping("/getAll")
     public R<CourseManger> getAll(){
         CourseManger courseManger = courseService.getAll();

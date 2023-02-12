@@ -12,7 +12,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -28,6 +31,13 @@ public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements
     @Autowired
     private CourseDao courseDao;
 
+    /**
+     * 主查询方法，包括模糊查询、分页查询
+     * @param page
+     * @param pageSize
+     * @param name 模糊查询“题目描述”
+     * @return Manger数据集，包括数据集合，数据条数
+     */
     @Override
     public CourseManger getPage(Integer page, Integer pageSize, String name) {
         IPage<Course> page1 = new Page<>(page,pageSize);//设置分页
@@ -43,14 +53,29 @@ public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements
         return t;
     }
 
+    /**
+     * 将课程id查询到课程名称
+     * @param courseIds 需要查询的课程id
+     * @return 以Map<Integer, String>类型返回，key为课程id，value为对应的课程名称
+     */
     @Override
-    public String getNameById(Integer courseId) {
+    public Map<Integer, String> getNamesByIds(List<Integer> courseIds) {
         LambdaQueryWrapper<Course> courseLambdaQueryWrapper = new LambdaQueryWrapper<>();//查询条件对象
-        courseLambdaQueryWrapper.select(Course::getName).eq(Course::getId, courseId);//设置查询的字段
-        Course course = courseDao.selectOne(courseLambdaQueryWrapper);
-        return course.getName();
+        courseLambdaQueryWrapper.in(Course::getId, courseIds);//设置查询的字段
+        List<Course> course = courseDao.selectList(courseLambdaQueryWrapper);
+
+        Map<Integer,String> map = new HashMap<>();
+        for (Course c: course) {
+            map.put(c.getId(),c.getName());
+        }
+
+        return map;
     }
 
+    /**
+     * 查询所有的课程id和课程名称
+     * @return
+     */
     @Override
     public CourseManger getAll() {
         LambdaQueryWrapper<Course> courseLambdaQueryWrapper = new LambdaQueryWrapper<>();//查询条件对象
@@ -60,6 +85,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements
         CourseManger t = new CourseManger();
         t.setTotal(courseList.size());
         t.setList(courseList);
+
         return t;
     }
 }

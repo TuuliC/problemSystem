@@ -31,6 +31,11 @@ public class TeaCourServiceImpl extends ServiceImpl<TeaCourDao, TeaCour> impleme
     @Autowired
     private TeacherDao teacherDao;
 
+    /**
+     * 通过课程id查询出管理该课程的老师名字，效率极低，需优化
+     * @param courseId 课程id
+     * @return 管理该课程的老师名字的集合
+     */
     @Override
     public List<String> getTeaNamesByCourId(Integer courseId) {
         //查询管理该课程的所有老师的id

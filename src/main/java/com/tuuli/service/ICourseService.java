@@ -3,7 +3,9 @@ package com.tuuli.service;
 import com.tuuli.domain.Course;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.tuuli.dto.CourseManger;
-import com.tuuli.dto.QuestionsManger;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -15,6 +17,6 @@ import com.tuuli.dto.QuestionsManger;
  */
 public interface ICourseService extends IService<Course> {
     CourseManger getPage(Integer page, Integer pageSize, String name);
-    String getNameById(Integer courseId);
+    Map<Integer, String> getNamesByIds(List<Integer> courseId);
     CourseManger getAll();
 }

@@ -28,16 +28,13 @@
                     @keyup.enter.native="handleQueryTest"
             >
             </el-input>
-
             <span style="height: 40px">
-        <el-button
-                type="text"
-                style="margin-right: 560px"
-                @click="initTest"
-        >
-          <img src="../../images/icons/sreach.png" style="width: 20px;height: 20px;margin-top: 0px;"/>
-        </el-button>
-        </span>
+<!--                <el-button icon="el-icon-search" type="primary" plain style="margin-right: 20px" @click="initTest" >搜索</el-button>-->
+                <el-button icon="el-icon-search" type="primary" plain circle style="margin-right: 20px" @click="initTest"></el-button>
+            </span>
+            <span style="height: 40px">
+                <el-button type="info" plain style="margin-right: 400px;" @click="clearFilter">清除所有筛选条件</el-button>
+            </span>
 
             <div class="tableLab">
                 <el-button
@@ -76,6 +73,7 @@
             </div>
         </div>
         <el-table
+                ref="table"
                 :data="tableData"
                 stripe
                 :border="true"
@@ -86,18 +84,23 @@
                 :cell-style="{ 'text-align': 'center' }"
         >
             <el-table-column
+                    fixed
                     type="selection"
-                    width="50"
+                    width="45"
             ></el-table-column>
             <el-table-column
+                    fixed
                     type="index"
                     width="50"
                     label="序号"
             ></el-table-column>
             <el-table-column
+                    sortable
                     prop="type"
-                    width="80"
+                    width="105"
                     label="题目类型"
+                    :filters="typeList"
+                    :filter-method="filterHandler"
             ></el-table-column>
             <el-table-column
                     prop="description"
@@ -124,28 +127,41 @@
                     label="答案"
             ></el-table-column>
             <el-table-column
+                    sortable
                     prop="quesCourStr"
-                    width="00"
+                    width="100"
                     label="所属课程"
+                    :filters="courseList"
+                    :filter-method="filterHandler"
             ></el-table-column>
             <el-table-column
+                    sortable
                     prop="chapter"
                     width="90"
                     label="所属章节"
+                    :filters="chapterList"
+                    :filter-method="filterHandler"
             ></el-table-column>
             <el-table-column
+                    sortable
                     prop="hard"
                     width="60"
                     label="难度"
+                    :filters="hardList"
+                    :filter-method="filterHandler"
             ></el-table-column>
             <el-table-column
+                    sortable
                     prop="score"
                     width="60"
                     label="分值"
+                    :filters="scoreList"
+                    :filter-method="filterHandler"
             ></el-table-column>
             <el-table-column
+                    fixed="right"
                     label="操作"
-                    width="100"
+                    width="80"
                     align="center"
             >
                 <template slot-scope="scope">
@@ -196,7 +212,13 @@
                 page: 1,
                 pageSize: 10,
                 tableData: [],
-                checkList: []
+                checkList: [],
+
+                typeList: [],
+                courseList: [],
+                chapterList: [],
+                hardList: [],
+                scoreList: [],
             }
         },
         computed: {},
@@ -221,28 +243,68 @@
                     if (String(res.code) === '1') {
                         this.tableData = res.data.list || []
                         this.counts = res.data.total
-                        for (var i = 0; i < res.data.list.length; i++) {
+
+                        //对接受到的数据的某些字段内容进行封装
+                        for (let i = 0; i < res.data.list.length; i++) {
                             if (res.data.list[i].picture != null && res.data.list[i].picture !== '') {
                                 res.data.list[i].picture = "../../myImages/" + res.data.list[i].picture
                             }
-                            var string = ''
+
+                            let string = '';
                             if (res.data.list[i].type === '选择题') {
-                                for (var j = 0; j < res.data.list[i].options.length; j++) {
-                                    string += "选项" + (j + 1) + ":" + res.data.list[i].options[j] + "; "
+                                for (let j = 0; j < res.data.list[i].options.length; j++) {
+                                    string += "选项" + (j + 1) + ":" + res.data.list[i].options[j] + (j === res.data.list[i].options.length-1 ? '' : '; ')
                                 }
                             }
                             res.data.list[i].options = string
 
                         }
+
+                        //封装筛选条件的集合，用于表格的筛选功能
+                        let list = res.data.list.map((obj) => ({text: obj.quesCourStr, value: obj.quesCourStr}))
+                        this.courseList = this.listNodup(list, 'text')
+
+                        list = res.data.list.map((obj) => ({text: obj.type, value: obj.type}))
+                        this.typeList = this.listNodup(list, 'text')
+
+                        list = res.data.list.map((obj) => ({text: obj.chapter, value: obj.chapter}))
+                        this.chapterList = this.listNodup(list, 'text')
+
+                        list = res.data.list.map((obj) => ({text: obj.hard, value: obj.hard}))
+                        this.hardList = this.listNodup(list, 'text')
+
+                        list = res.data.list.map((obj) => ({text: obj.score, value: obj.score}))
+                        this.scoreList = this.listNodup(list, 'text')
                     }
                 }).catch(err => {  //
                     this.$message.error('请求出错了：' + err)
                 })
             },
+            //筛选功能中的去重方法
+            listNodup(oldList, keyName) {
+                let result = {};
+                for (let i = 0; i < oldList.length; i++) {
+                    result[oldList[i][keyName]] = oldList[i];
+                    //list[i].name不能重复,达到去重效果,且这里必须知晓一个键名 keyName
+                }
+                let resultList = [];
+                for (const item in result) {
+                    resultList.push(result[item]);
+                }
+                return resultList;
+            },
+
+            clearFilter() {
+                this.$refs.table.clearFilter();
+                if (this.input!==''){
+                    this.input = '';
+                    this.initTest();
+                }
+            },
+
             /**
              * 页面初始页码
              * */
-
             handleQueryTest() {
                 this.page = 1;
                 this.initTest();
@@ -291,6 +353,10 @@
                 })
             },
 
+            filterHandler(value, row, column) {
+                const property = column['property'];
+                return row[property] === value;
+            },
 
             // 全部操作
             handleSelectionChange(val) {
