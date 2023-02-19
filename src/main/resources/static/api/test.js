@@ -56,3 +56,11 @@ const getCourses =() =>{
     method:'get'
   })
 }
+const buildTest =(ids) =>{
+  return $axios({
+    url:'/questions/buildTest',
+    method:'get',
+    params: { ids }
+  })
+}
+

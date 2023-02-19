@@ -1,7 +1,7 @@
 package com.tuuli.dao;
 
-import com.tuuli.domain.Course;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.tuuli.domain.Course;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

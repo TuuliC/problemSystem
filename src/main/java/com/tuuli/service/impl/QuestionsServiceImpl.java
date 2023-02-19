@@ -30,9 +30,10 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
 
     /**
      * 主查询方法，包括模糊查询、分页查询
+     *
      * @param page
      * @param pageSize
-     * @param name 模糊查询“题目描述”
+     * @param name     模糊查询“题目描述”
      * @return Manger数据集，包括数据集合，数据条数
      */
     @Override
@@ -52,6 +53,7 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
 
     /**
      * 新增数据
+     *
      * @param question 题目对象
      */
     @Override
@@ -61,6 +63,7 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
 
     /**
      * 通过题目id删除数据，包括批量删除
+     *
      * @param ids 需删除的题目id的集合
      */
     @Override
@@ -70,6 +73,7 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
 
     /**
      * 通过题目id查询该题目的信息
+     *
      * @param id 题目id
      * @return Question对象
      */
@@ -89,6 +93,7 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
     /**
      * TODO 该方法暂未使用
      * 通过题目id查询改题目的图片名称
+     *
      * @param id 题目id
      * @return 该题目有图片时返回图片名字，否则返回空字符串
      */
@@ -98,5 +103,17 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
         questionsLambdaQueryWrapper.select(Question::getPicture).eq(Question::getId, id);//设置查询条件
         Question question = questionsDao.selectOne(questionsLambdaQueryWrapper);
         return question.getPicture() == null ? "" : question.getPicture();
+    }
+
+    /**
+     * 调用python脚本进行组建试卷
+     *
+     * @param ids 题目id集合
+     */
+    @Override
+    public void buildTestCallPython(Integer[] ids) {
+        /*
+        调用python
+         */
     }
 }

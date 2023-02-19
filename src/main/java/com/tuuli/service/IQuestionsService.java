@@ -19,5 +19,6 @@ public interface IQuestionsService extends IService<Question> {
     Question queryById(Integer id);
     void update(Question question);
     String getPictureById(Integer id);
+    void buildTestCallPython(Integer[] ids);
 
 }

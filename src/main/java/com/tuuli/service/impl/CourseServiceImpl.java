@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author tuuli
@@ -33,16 +33,17 @@ public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements
 
     /**
      * 主查询方法，包括模糊查询、分页查询
+     *
      * @param page
      * @param pageSize
-     * @param name 模糊查询“题目描述”
+     * @param name     模糊查询“题目描述”
      * @return Manger数据集，包括数据集合，数据条数
      */
     @Override
     public CourseManger getPage(Integer page, Integer pageSize, String name) {
-        IPage<Course> page1 = new Page<>(page,pageSize);//设置分页
+        IPage<Course> page1 = new Page<>(page, pageSize);//设置分页
         LambdaQueryWrapper<Course> courseLambdaQueryWrapper = new LambdaQueryWrapper<>();//查询条件对象
-        courseLambdaQueryWrapper.like(!StringUtils.isBlank(name),Course::getName,name);//设置查询条件
+        courseLambdaQueryWrapper.like(!StringUtils.isBlank(name), Course::getName, name);//设置查询条件
         courseDao.selectPage(page1, courseLambdaQueryWrapper);
         Integer total = Math.toIntExact(page1.getTotal());
 
@@ -55,18 +56,19 @@ public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements
 
     /**
      * 将课程id查询到课程名称
+     *
      * @param courseIds 需要查询的课程id
      * @return 以Map<Integer, String>类型返回，key为课程id，value为对应的课程名称
      */
     @Override
     public Map<Integer, String> getNamesByIds(List<Integer> courseIds) {
         LambdaQueryWrapper<Course> courseLambdaQueryWrapper = new LambdaQueryWrapper<>();//查询条件对象
-        courseLambdaQueryWrapper.in(Course::getId, courseIds);//设置查询的字段
+        courseLambdaQueryWrapper.select(Course::getId, Course::getName).in(Course::getId, courseIds);//设置查询的字段和条件
         List<Course> course = courseDao.selectList(courseLambdaQueryWrapper);
 
-        Map<Integer,String> map = new HashMap<>();
-        for (Course c: course) {
-            map.put(c.getId(),c.getName());
+        Map<Integer, String> map = new HashMap<>();
+        for (Course c : course) {
+            map.put(c.getId(), c.getName());
         }
 
         return map;
@@ -74,12 +76,13 @@ public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements
 
     /**
      * 查询所有的课程id和课程名称
+     *
      * @return
      */
     @Override
     public CourseManger getAll() {
         LambdaQueryWrapper<Course> courseLambdaQueryWrapper = new LambdaQueryWrapper<>();//查询条件对象
-        courseLambdaQueryWrapper.select(Course::getId,Course::getName);//设置查询条件
+        courseLambdaQueryWrapper.select(Course::getId, Course::getName);//设置查询条件
         List<Course> courseList = courseDao.selectList(courseLambdaQueryWrapper);
 
         CourseManger t = new CourseManger();

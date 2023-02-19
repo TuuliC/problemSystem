@@ -50,9 +50,9 @@
                         type="text"
                         size="small"
                         style="color: #85ce61;border-right: solid 1px #d8dde3;"
-                        @click="open()"
+                        @click="buildHandleTest()"
                 >
-                    批量启用&nbsp&nbsp&nbsp
+                    组建试卷&nbsp&nbsp&nbsp
                 </el-button>
 
                 <el-button
@@ -373,6 +373,25 @@
             handleCurrentChange(val) {
                 this.page = val
                 this.initTest()
+            },
+
+            buildHandleTest(){
+                if (this.checkList.length === 0) {
+                    return this.$message.error('请选择操作对象')
+                }
+                buildTest(this.checkList.join(',')).then(res => {
+                    if (res.code === 1) {
+                        if (res.data === 'success')
+                            this.$message.success('操作成功');
+                        else
+                            this.$message.error(res.data);
+                        this.handleQueryTest()
+                    } else {
+                        this.$message.error(res.msg || '操作失败')
+                    }
+                }).catch(err => {
+                    this.$message.error('请求出错了：' + err)
+                })
             },
 
             open() {

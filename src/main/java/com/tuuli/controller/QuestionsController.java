@@ -5,6 +5,7 @@ import com.tuuli.domain.Question;
 import com.tuuli.dto.QuestionsManger;
 import com.tuuli.service.ICourseService;
 import com.tuuli.service.IQuestionsService;
+import com.tuuli.util.PictureHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,9 +32,10 @@ public class QuestionsController {
 
     /**
      * 主查询函数，包括模糊查询和分页查询
+     *
      * @param page
      * @param pageSize
-     * @param name 模糊查询“题目描述”
+     * @param name     模糊查询“题目描述”
      * @return
      */
     @GetMapping("/page")
@@ -42,15 +44,23 @@ public class QuestionsController {
         //以下为将其中的课程id转为课程名称
         List<Integer> ids = new ArrayList<>();
         for (Question q : page1.getList()) {//获取所有的课程id
-            if (q.getQuesCourId() != null && q.getQuesCourId() != 0) {
+            if (q.getQuesCourId() != null && q.getQuesCourId() != 0 && !ids.contains(q.getQuesCourId())) {
                 ids.add(q.getQuesCourId());
             }
         }
-        //通过课程id查询对应的课程名称，以key-value形式保存到Map中
-        Map<Integer, String> names = courseService.getNamesByIds(ids);
-        //将课程名称写入到数据集中
-        for (Question q : page1.getList()) {
-            q.setQuesCourStr(names.get(q.getQuesCourId()));
+
+        /*
+        事实上 前端已作规定，ids集合永远不会为空。但如果不作判断，在分页查询时，页数选择第一页以后，同时每页展示条数的选择大于数据总条数时，会出现未知bug
+        即 page > 1 && pageSize > 数据总条数 时出现未知bug
+        例：总共有15条数据，展示时默认每页展示10条数据，若用户在查看第2页时，切换为每页查看20条数据，则出现未知bug
+         */
+        if (!ids.isEmpty()) {
+            //通过课程id查询对应的课程名称，以key-value形式保存到Map中
+            Map<Integer, String> names = courseService.getNamesByIds(ids);
+            //将课程名称写入到数据集中
+            for (Question q : page1.getList()) {
+                q.setQuesCourStr(names.get(q.getQuesCourId()));
+            }
         }
 
         return R.success(page1);
@@ -58,17 +68,18 @@ public class QuestionsController {
 
     /**
      * 新增数据
+     *
      * @param question 题目对象
      * @return
      */
     @PostMapping("/add")
-    public R<String> add(Question question){
+    public R<String> add(Question question) {
 
         //题目图片不为空时保存题目图片
         if (question.getFile() != null) {
             String newFileName = null;
             try {
-                newFileName = savePicture(question.getFile());
+                newFileName = PictureHandle.savePicture(question.getFile());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -81,6 +92,7 @@ public class QuestionsController {
 
     /**
      * 删除数据，包括删除单个和批量删除
+     *
      * @param ids 需删除的题目id的集合
      * @return
      */
@@ -96,6 +108,7 @@ public class QuestionsController {
 
     /**
      * 通过题目id查询单个数据
+     *
      * @param id 题目id
      * @return
      */
@@ -108,13 +121,14 @@ public class QuestionsController {
     /**
      * 修改题目数据
      * isEditFile参数错误时报异常
-     * @param question 修改的题目对象
+     *
+     * @param question   修改的题目对象
      * @param isEditFile 图片的修改状态标识，false-未修改图片，del-删除图片，add新增图片，edit-更换图片，
      *                   除false和add状态外，标识后面还带有原图片的名称，例：isEditFile = edit5dj3p5.png
      * @return
      */
     @PostMapping("/update")
-    public R<String> update(Question question, @RequestParam("isEditFile") String isEditFile)  {
+    public R<String> update(Question question, @RequestParam("isEditFile") String isEditFile) {
         //判断图片的修改状态
         if (Objects.equals(isEditFile, "false")) {//不作修改
             //
@@ -125,58 +139,40 @@ public class QuestionsController {
         } else if (Objects.equals(isEditFile, "add")) {//新增
             String newFileName = null;
             try {
-                newFileName = savePicture(question.getFile());
+                newFileName = PictureHandle.savePicture(question.getFile());
             } catch (IOException e) {
                 e.printStackTrace();
             }
             question.setPicture(newFileName);
-        } else if (isEditFile.startsWith("edit")){//更换 == 删除 + 新增
+        } else if (isEditFile.startsWith("edit")) {//更换 == 删除 + 新增
             File file = new File("src/main/resources/static/questionsImages/" + isEditFile.substring(4));
             file.delete();
             String newFileName = null;
             try {
-                newFileName = savePicture(question.getFile());
+                newFileName = PictureHandle.savePicture(question.getFile());
             } catch (IOException e) {
                 e.printStackTrace();
             }
             question.setPicture(newFileName);
-        }
-        else throw new IllegalArgumentException("修改题目数据时前端传参错误！");
+        } else throw new IllegalArgumentException("修改题目数据时前端传参错误！");
 
         questionsService.update(question);
         return R.success("success");
     }
 
     /**
-     * 保存图片的工具类
-     * TODO 后续需要将该类放到工具类的包下
-     * @param file 需保存的图片
-     * @return 唯一的图片名字
-     * @throws IOException
+     * 组建试卷
+     *
+     * @param ids 题目id集合
+     * @return
      */
-    private String savePicture(MultipartFile file) throws IOException {
-        String fileName = file.getOriginalFilename(); // 获取文件名
-        String suffixName = fileName.substring(fileName.lastIndexOf("."));// 获取文件的后缀名
-        //为防止文件重名被覆盖，为每个文件都生成不同的名字
-        UUID uuid = UUID.randomUUID();//生成一个唯一标识符
-        String newFileName = uuid.toString().replaceAll("-", "") + suffixName;
-
-        // 文件上传后存储的位置
-        File savePos = new File("src/main/resources/static/questionsImages");
-        // 获取存放位置的规范路径
-        String realPath = savePos.getCanonicalPath();
-
-        File dir = new File(realPath, newFileName);//创建文件流，对文件操作
-        File filepath = new File(realPath);
-        if (!filepath.exists()) {
-            //路径不存在则创建
-            filepath.mkdirs();
-        }
-        file.transferTo(dir);//把图片写进去
-
-        return newFileName;
+    @GetMapping("/buildTest")
+    private R<String> buildTest(Integer[] ids) {
+        System.out.println("ids = " + Arrays.toString(ids));
+        //调用python脚本
+        questionsService.buildTestCallPython(ids);
+        return R.success("success");
     }
-
 
 }
 
