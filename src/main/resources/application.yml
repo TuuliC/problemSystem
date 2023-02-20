@@ -8,8 +8,15 @@ spring:
   thymeleaf:
     cache: false        # 禁用缓存
     mode: LEGACYHTML5   # 非严格型检查 默认是html 严格检查
-
-
+  application:
+    name: pyScript
+server:
+  port: 9999
+pyScript:
+  python:
+    script:
+      path: src/main/resources/static/py/word.py
+    path: C:\\Users\\I\\AppData\\Local\\Programs\\Python\\Python39
 #mybatis-plus日志
 #mybatis-plus:
 #  configuration:

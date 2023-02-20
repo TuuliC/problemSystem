@@ -43,7 +43,7 @@ public class QuestionsController {
         QuestionsManger page1 = questionsService.getPage(page, pageSize, name);
         //以下为将其中的课程id转为课程名称
         List<Integer> ids = new ArrayList<>();
-        for (Question q : page1.getList()) {//获取所有的课程id
+        for (Question    q : page1.getList()) {//获取所有的课程id
             if (q.getQuesCourId() != null && q.getQuesCourId() != 0 && !ids.contains(q.getQuesCourId())) {
                 ids.add(q.getQuesCourId());
             }
@@ -173,6 +173,5 @@ public class QuestionsController {
         questionsService.buildTestCallPython(ids);
         return R.success("success");
     }
-
 }
 
