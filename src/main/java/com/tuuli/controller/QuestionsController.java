@@ -166,7 +166,7 @@ public class QuestionsController {
      * @param ids 题目id集合
      * @return
      */
-    @GetMapping("/buildTest")
+    @PostMapping("/buildTest")
     private R<String> buildTest(Integer[] ids) {
         System.out.println("ids = " + Arrays.toString(ids));
         //调用python脚本

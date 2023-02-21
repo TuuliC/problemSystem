@@ -11,12 +11,12 @@ spring:
   application:
     name: pyScript
 server:
-  port: 9999
+  port: 8080
 pyScript:
   python:
     script:
-      path: src/main/resources/static/py/word.py
-    path: C:\\Users\\I\\AppData\\Local\\Programs\\Python\\Python39
+      path: E:\\code\\gitRepository\\problemSystem-K\\src\\main\\resources\\static\\py\\test.py
+    path: C:\Users\l\AppData\Local\Programs\Python\Python39\\python.exe
 #mybatis-plus日志
 #mybatis-plus:
 #  configuration:

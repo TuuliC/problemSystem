@@ -1,19 +1,12 @@
+import sys
+
 from docx import Document
 from docx.shared import RGBColor, Pt
 from docx.oxml.ns import qn
 import pymysql
 import ast
 
-db = pymysql.connect(host="localhost", user="root", password="0000", database="db")
-cursor = db.cursor()
-document = Document('学校模板.docx')
-document.styles['Normal'].font.name = 'Times New Roman'
-document.styles['Normal']._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
-document.styles['Normal'].font.size = Pt(12)
-document.styles['Normal'].font.color.rgb = RGBColor(0, 0, 0)
-questionNumber = 1
-op = ['A', 'B', 'C', 'D']
-opNum = 0
+
 
 def getQuestions(id):
     sql = f"select description from tb_questions where id = {id}"
@@ -51,9 +44,22 @@ def addQuestion(list):
 
 
 if __name__ == '__main__':
-    selectList = ['1', '6', '11', '39', '42']
-    gapArray = ['2', '44']
-    answerArray = ['40', '45', '43', '41']
+    db = pymysql.connect(host="gz-cynosdbmysql-grp-84tdgg43.sql.tencentcdb.com", user="root", password="gdupt@3c807",
+                         database="db", port=25120)
+    cursor = db.cursor()
+    document = Document('E:\\code\\gitRepository\\problemSystem-K\\src\main\\resources\\static\\py\\学校模板.docx')
+    document.styles['Normal'].font.name = 'Times New Roman'
+    document.styles['Normal']._element.rPr.rFonts.set(qn('w:eastAsia'), u'宋体')
+    document.styles['Normal'].font.size = Pt(12)
+    document.styles['Normal'].font.color.rgb = RGBColor(0, 0, 0)
+    questionNumber = 1
+    op = ['A', 'B', 'C', 'D']
+    opNum = 0
+    savePath = "C:\\Users\\l\\Desktop\\"
+    test = sys.argv[1]
+    selectList = ['42']
+    gapArray = ['44']
+    answerArray = ['41']
 
     point1 = document.add_picture('得分.bmp')
     p1 = document.add_paragraph('')
@@ -70,7 +76,7 @@ if __name__ == '__main__':
     p3.add_run('三、将下列逻辑函数化为最简与或式：（方法不限，写出化简步骤，每小题 5 分，共 15 分。）').bold = True
     addQuestion(answerArray)
 
-    document.save("over.docx")
+    document.save(savePath + "over.docx")
     cursor.close()
     db.close()
-    print('finish')
+    print("py retrun:"+test)

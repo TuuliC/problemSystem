@@ -11,8 +11,12 @@ import com.tuuli.dto.QuestionsManger;
 import com.tuuli.service.IQuestionsService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 
 /**
@@ -25,6 +29,13 @@ import java.util.Arrays;
  */
 @Service
 public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> implements IQuestionsService {
+
+    @Value("${pyScript.python.script.path}")
+    private String pythonScriptPath;
+
+    @Value("${pyScript.python.path}")
+    private String pythonPath;
+
     @Autowired
     private QuestionsDao questionsDao;
 
@@ -112,8 +123,22 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
      */
     @Override
     public void buildTestCallPython(Integer[] ids) {
-        /*
-        调用python
-         */
+        String[] args = new String[]{pythonPath, pythonScriptPath, Arrays.toString(ids)};
+        try {
+            // 执行Python文件，并传入参数
+            Process process = Runtime.getRuntime().exec(args);
+            BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String actionStr = in.readLine();
+            if (actionStr != null) {
+                System.out.println(actionStr);
+            }
+            in.close();
+            process.waitFor();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("end");
     }
 }
