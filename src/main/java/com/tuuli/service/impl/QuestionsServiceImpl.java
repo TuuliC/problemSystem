@@ -9,11 +9,12 @@ import com.tuuli.dao.QuestionsDao;
 import com.tuuli.domain.Question;
 import com.tuuli.dto.QuestionsManger;
 import com.tuuli.service.IQuestionsService;
+import com.tuuli.util.ProcessTestRunnable;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -123,6 +124,15 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
      */
     @Override
     public void buildTestCallPython(Integer[] ids) {
+//        ProcessBuilder pb = new ProcessBuilder(pythonPath, pythonScriptPath, "6666");
+//        pb.redirectErrorStream(true);//将error数据重定向
+//        Process p = null; //开启进程
+//        try {
+//            p = pb.start();
+//            new Thread(new ProcessTestRunnable(p)).start();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         String[] args = new String[]{pythonPath, pythonScriptPath, Arrays.toString(ids)};
         try {
             // 执行Python文件，并传入参数

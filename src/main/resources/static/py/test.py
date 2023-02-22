@@ -6,7 +6,7 @@ import sys
 if __name__ == '__main__':
     # stateStr = sys.argv[1]
     # number = int(stateStr) + 5
-    document = Document('E:\\code\\gitRepository\\problemSystem-K\\src\main\\resources\\static\\py\\学校模板.docx')
+    document = Document('E:\\code\\git\\problemSystem-K\\src\main\\resources\\static\\py\\学校模板.docx')
 
     point1 = document.add_picture('得分.bmp')
     savePath = "C:\\Users\\l\\Desktop\\"

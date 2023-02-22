@@ -10,13 +10,11 @@ spring:
     mode: LEGACYHTML5   # 非严格型检查 默认是html 严格检查
   application:
     name: pyScript
-server:
-  port: 8080
 pyScript:
   python:
     script:
-      path: E:\\code\\gitRepository\\problemSystem-K\\src\\main\\resources\\static\\py\\test.py
-    path: C:\Users\l\AppData\Local\Programs\Python\Python39\\python.exe
+      path: E:\\code\\git\\problemSystem-K\\src\\main\\resources\\static\\py\\word.py
+    path: C:\\Users\\10276\\AppData\\Local\\Programs\\Python\\Python39\\python.exe
 #mybatis-plus日志
 #mybatis-plus:
 #  configuration:
