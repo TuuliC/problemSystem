@@ -35,7 +35,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         String realPath = null;
         try {
-            realPath = new File("src/main/resources/static/questionsImages").getCanonicalPath();
+            realPath = new File("src/main/resources/static/pyCreateFile").getCanonicalPath();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -46,7 +46,7 @@ public class WebConfig implements WebMvcConfigurer {
         //方法二，不会出现方法一的问题，但是只能从本地获取资源
         //registry.addResourceHandler("/myImages/**").addResourceLocations("file:"+path);
         //方法三，同方法二，区别是动态获取本地地址
-        registry.addResourceHandler("/myImages/**").addResourceLocations("file:" + realPath + "/");
+        registry.addResourceHandler("/resultFile/**").addResourceLocations("file:" + realPath + "/");
 
     }
 }

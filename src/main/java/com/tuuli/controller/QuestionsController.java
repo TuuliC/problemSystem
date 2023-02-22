@@ -6,6 +6,7 @@ import com.tuuli.dto.QuestionsManger;
 import com.tuuli.service.ICourseService;
 import com.tuuli.service.IQuestionsService;
 import com.tuuli.util.PictureHandle;
+import com.tuuli.util.UploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,7 +80,8 @@ public class QuestionsController {
         if (question.getFile() != null) {
             String newFileName = null;
             try {
-                newFileName = PictureHandle.savePicture(question.getFile());
+                //newFileName = PictureHandle.savePicture(question.getFile());
+                newFileName = UploadUtil.uploadImage(question.getFile());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -133,23 +135,23 @@ public class QuestionsController {
         if (Objects.equals(isEditFile, "false")) {//不作修改
             //
         } else if (isEditFile.startsWith("del")) {//删除
-            File file = new File("src/main/resources/static/questionsImages/" + isEditFile.substring(3));
-            file.delete();
+//            File file = new File("src/main/resources/static/questionsImages/" + isEditFile.substring(3));
+//            file.delete();
             question.setPicture("");
         } else if (Objects.equals(isEditFile, "add")) {//新增
             String newFileName = null;
             try {
-                newFileName = PictureHandle.savePicture(question.getFile());
+                newFileName = UploadUtil.uploadImage(question.getFile());
             } catch (IOException e) {
                 e.printStackTrace();
             }
             question.setPicture(newFileName);
         } else if (isEditFile.startsWith("edit")) {//更换 == 删除 + 新增
-            File file = new File("src/main/resources/static/questionsImages/" + isEditFile.substring(4));
-            file.delete();
+//            File file = new File("src/main/resources/static/questionsImages/" + isEditFile.substring(4));
+//            file.delete();
             String newFileName = null;
             try {
-                newFileName = PictureHandle.savePicture(question.getFile());
+                newFileName = UploadUtil.uploadImage(question.getFile());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -166,7 +168,7 @@ public class QuestionsController {
      * @param ids 题目id集合
      * @return
      */
-    @PostMapping("/buildTest")
+    @GetMapping("/buildTest")
     private R<String> buildTest(Integer[] ids) {
         System.out.println("ids = " + Arrays.toString(ids));
         //调用python脚本

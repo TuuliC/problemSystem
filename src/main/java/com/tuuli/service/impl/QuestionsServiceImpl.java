@@ -149,6 +149,6 @@ public class QuestionsServiceImpl extends ServiceImpl<QuestionsDao, Question> im
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        System.out.println("end");
+        System.out.println("buildTestCallPython service end.");
     }
 }

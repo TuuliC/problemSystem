@@ -16,7 +16,12 @@
     </style>
 </head>
 <body>
-<div class="dashboard-container" id="combo-app">
+<div class="dashboard-container" id="combo-app"
+     v-loading="loading"
+     element-loading-text="生成试卷中，可能需要5-20秒，请耐心等待..."
+     element-loading-spinner="el-icon-loading"
+     element-loading-background="rgba(0, 0, 0, 0.8)"
+>
     <div class="container">
         <div class="tableBar">
             <el-input
@@ -54,6 +59,7 @@
                 >
                     组建试卷&nbsp&nbsp&nbsp
                 </el-button>
+
 
                 <el-button
                         type="text"
@@ -214,11 +220,14 @@
                 tableData: [],
                 checkList: [],
 
+                fileUrl: '',
                 typeList: [],
                 courseList: [],
                 chapterList: [],
                 hardList: [],
                 scoreList: [],
+
+                loading: false,
             }
         },
         computed: {},
@@ -247,7 +256,7 @@
                         //对接受到的数据的某些字段内容进行封装
                         for (let i = 0; i < res.data.list.length; i++) {
                             if (res.data.list[i].picture != null && res.data.list[i].picture !== '') {
-                                res.data.list[i].picture = "../../myImages/" + res.data.list[i].picture
+                                // res.data.list[i].picture = "../../myImages/" + res.data.list[i].picture
                             }
 
                             let string = '';
@@ -379,10 +388,16 @@
                 if (this.checkList.length === 0) {
                     return this.$message.error('请选择操作对象')
                 }
+                this.loading = true;
                 buildTest(this.checkList.join(',')).then(res => {
                     if (res.code === 1) {
                         if (res.data === 'success')
-                            this.$message.success('操作成功');
+                        {
+                            this.loading = false;
+                            this.$message.success('组建试卷完成，已开始下载试卷word文件');
+                            window.open("../../resultFile/test.docx")
+
+                        }
                         else
                             this.$message.error(res.data);
                         this.handleQueryTest()

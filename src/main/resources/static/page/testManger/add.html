@@ -280,7 +280,7 @@
                             this.flag = true;
                             this.oldFileName = res.data.picture;
                             this.headFileList = [];
-                            this.headFileList.push({url: "../../myImages/" + res.data.picture})
+                            this.headFileList.push({url: res.data.picture})
                             this.hideUpload = this.headFileList.length >= this.limitCount;
                         }
                         if (res.data.options.length !== 0) {
